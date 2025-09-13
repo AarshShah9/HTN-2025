@@ -7,9 +7,9 @@ This module handles image upload functionality, including:
 - Audio-based image search (placeholder)
 """
 
+import base64
 import os
 import uuid
-import base64
 from typing import List, Optional
 
 from database.database import get_db_session
@@ -38,6 +38,7 @@ def get_image_repository(
         ImageRepository: Repository instance for image operations
     """
     return ImageRepository(session)
+
 
 def get_audio_repository(
     session: AsyncSession = Depends(get_db_session),
@@ -91,15 +92,23 @@ async def upload_image(
             # Transcribe audio using the transcription utility
             transcription = transcribe_audio_from_bytes(audio_bytes, "audio.wav")
             # Create audio record in database
-            audio_record = await audio_repository.create_audio(transcription=transcription)
-            audio_id = audio_record.id
+            audio_record = await audio_repository.create_audio(
+                transcription=transcription
+            )
+            audio_id = str(audio_record.id)
         except Exception as e:
             print(f"Error transcribing audio: {str(e)}")
             # Create audio record without transcription if transcription fails
             audio_record = await audio_repository.create_audio(transcription=None)
-            audio_id = audio_record.id
+            audio_id = str(audio_record.id)
+
+    if not base64_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="No image data provided"
+        )
 
     # Generate unique ID for the image
+    image_record = None
     for image in base64_data:
         image_id = str(uuid.uuid4())
 
@@ -127,6 +136,11 @@ async def upload_image(
         )
 
     # Return the created image record as response model
+    if image_record is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create image record",
+        )
     return ImageResponse.model_validate(image_record)
 
 

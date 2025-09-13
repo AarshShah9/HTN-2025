@@ -9,8 +9,8 @@ This module sets up the FastAPI application with:
 """
 
 import asyncio
-from contextlib import asynccontextmanager
 import os
+from contextlib import asynccontextmanager
 from typing import List
 
 from app.routers.image import router as image_router
@@ -26,21 +26,21 @@ from fastapi.staticfiles import StaticFiles
 async def lifespan(app: FastAPI):
     """Application lifespan manager.
 
-    Handles startup and shutdown operations:
-    - Database initialization on startup
-    - Background worker management
-    - Cleanup on shutdown
-`
-    Args:
-        app: FastAPI application instance
+        Handles startup and shutdown operations:
+        - Database initialization on startup
+        - Background worker management
+        - Cleanup on shutdown
+    `
+        Args:
+            app: FastAPI application instance
 
-    Yields:
-        None: Control to FastAPI during application runtime
+        Yields:
+            None: Control to FastAPI during application runtime
     """
     # Initialize database
     await init_db()
     print("Database initialized")
-    
+
     # Background tasks storage
     background_tasks: List[asyncio.Task] = []
 
@@ -62,13 +62,13 @@ app = FastAPI(
     title="HTN 2025 - AI-Powered Memory Gallery",
     description="A sophisticated image management system with AI-powered tagging and search",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Add CORS middleware to allow frontend connections
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend URL
+    allow_origins=["http://localhost:3000", "http://localhost:5173"],  # Frontend URLs
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -96,8 +96,9 @@ def read_root():
         "message": "HTN 2025 - AI-Powered Memory Gallery API",
         "version": "1.0.0",
         "status": "active",
-        "docs": "/docs"
+        "docs": "/docs",
     }
+
 
 # Development server startup
 if __name__ == "__main__":
@@ -109,5 +110,5 @@ if __name__ == "__main__":
         app,
         host="0.0.0.0",
         port=8000,
-        reload=True  # Enable auto-reload for development
+        reload=True,  # Enable auto-reload for development
     )
