@@ -54,7 +54,7 @@ def get_audio_repository(
     return AudioRepository(session)
 
 
-@router.post("/upload", response_model=ImageResponse)
+@router.post("/", response_model=ImageResponse)
 async def upload_image(
     frames: list[str],
     audio: str,
