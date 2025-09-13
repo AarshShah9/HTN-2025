@@ -10,13 +10,15 @@ This module handles image upload functionality, including:
 import base64
 import os
 import uuid
-from typing import List, Optional
+from typing import List, Optional, Any
+
+from pydantic import BaseModel
 
 from database.database import get_db_session
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.models import ImageResponse, ImageUpdate
+from app.models.models import ImageInput, ImageResponse, ImageUpdate
 from app.repository.audio_repository import AudioRepository
 from app.repository.image_repository import ImageRepository
 
@@ -54,15 +56,13 @@ def get_audio_repository(
     return AudioRepository(session)
 
 
-@router.post("/", response_model=ImageResponse)
+
+@router.post("/")
 async def upload_image(
-    frames: list[str],
-    audio: str,
-    latitude: Optional[float] = None,
-    longitude: Optional[float] = None,
+    data: ImageInput,
     repository: ImageRepository = Depends(get_image_repository),
     audio_repository: AudioRepository = Depends(get_audio_repository),
-):
+) -> ImageResponse:
     """Upload an image from base64 encoded data.
 
     This endpoint accepts base64 encoded image data, saves it to the file system,
@@ -84,14 +84,14 @@ async def upload_image(
         HTTPException: If file saving or database operation fails
     """
     # Process audio transcription - audio is required
-    if not audio or audio.strip() == "":
+    if not data.audio or data.audio.strip() == "":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Audio data is required"
         )
 
     try:
         # Decode base64 audio to bytes
-        audio_bytes = base64.b64decode(audio)
+        audio_bytes = base64.b64decode(data.audio)
         # Transcribe audio using the transcription utility
         transcription = transcribe_audio_from_bytes(audio_bytes, "audio.wav")
         # Create audio record in database
@@ -103,14 +103,14 @@ async def upload_image(
             detail=f"Failed to process audio: {str(e)}",
         )
 
-    if not frames:
+    if not data.frames:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="No image data provided"
         )
 
     # Generate unique ID for the image
     image_record = None
-    for image in frames:
+    for image in data.frames:
         image_id = str(uuid.uuid4())
 
         # Define filename and filepath for storage
@@ -132,8 +132,8 @@ async def upload_image(
             embeddings=None,  # No embeddings initially
             tagged=False,  # Not processed by AI yet
             audio_id=audio_id,  # Reference to AudioModel ID
-            latitude=latitude,
-            longitude=longitude,
+            latitude=data.latitude,
+            longitude=data.longitude,
         )
 
     # Return the created image record as response model

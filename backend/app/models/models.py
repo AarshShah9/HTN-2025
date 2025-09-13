@@ -17,7 +17,10 @@ class ImageBase(BaseModel):
 
 
 class ImageCreate(ImageBase):
-    path: str
+    frames: List[str] = Field(
+        ..., min_length=1, description="List of base64 encoded video frames"
+    ),
+    audio: str
 
 
 class ImageUpdate(BaseModel):
@@ -31,6 +34,11 @@ class ImageUpdate(BaseModel):
     latitude: Optional[float] = Field(default=None, ge=-90, le=90)
     longitude: Optional[float] = Field(default=None, ge=-180, le=180)
 
+class ImageInput(BaseModel):
+    frames: List[str]
+    audio: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 class ImageResponse(ImageBase):
     id: str  # UUID stored as string

@@ -62,7 +62,8 @@ app = FastAPI(
     title="HTN 2025 - AI-Powered Memory Gallery",
     description="A sophisticated image management system with AI-powered tagging and search",
     version="1.0.0",
-    lifespan=lifespan,
+    # lifespan=lifespan,
+    debug=True
 )
 
 # Add CORS middleware to allow frontend connections
@@ -78,7 +79,7 @@ app.add_middleware(
 os.makedirs("images", exist_ok=True)
 
 # Mount static files for images
-app.mount("/images", StaticFiles(directory="images"), name="images")
+# app.mount("/images", StaticFiles(directory="images"), name="images")
 
 # Include routers
 app.include_router(image_router)
