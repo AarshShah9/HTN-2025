@@ -7,7 +7,6 @@ export type MemoryImage = {
   location?: string;
   latitude?: number;
   longitude?: number;
-  people?: string[];
 };
 
 export type MemoryAppData = {

@@ -10,7 +10,10 @@ export type MemoriesData = {
 // Backend API response type
 interface BackendImageResponse {
   id: string;
-  path: string;
+  // New base64 image data field provided by backend
+  image?: string; // base64 without data URI header
+  // Retain path for backward compatibility during transition
+  path?: string;
   timestamp: string;
   description: string | null;
   tags: string[];
@@ -37,19 +40,31 @@ export const fetchMemories = async (): Promise<MemoriesData> => {
     const backendImages: BackendImageResponse[] = await response.json();
 
     // Map backend response to frontend types
-    const images: MemoryImage[] = backendImages.map((img) => ({
-      id: img.id,
-      date: new Date(img.timestamp).toISOString().split('T')[0], // Convert to YYYY-MM-DD format
-      tags: img.tags,
-      imageUrl: `${API_URL}/images/${img.path}`, // Construct full image URL
-      transcript: img.description || '', // Use description as transcript for now
-      location: img.latitude && img.longitude 
-        ? `${img.latitude.toFixed(4)}, ${img.longitude.toFixed(4)}` 
-        : undefined,
-      latitude: img.latitude || undefined,
-      longitude: img.longitude || undefined,
-      people: [] // Could be derived from tags in the future
-    }));
+    const images: MemoryImage[] = backendImages.map((img) => {
+      // Prefer new base64 image field; fallback to path if still provided.
+      let imageUrl: string;
+      if (img.image) {
+        // If backend already prepends data URI scheme, use as-is; otherwise add a sensible default.
+        imageUrl = img.image.startsWith('data:') ? img.image : `data:image/jpeg;base64,${img.image}`;
+      } else if (img.path) {
+        imageUrl = `${API_URL}/images/${img.path}`;
+      } else {
+        imageUrl = '';
+      }
+
+      return {
+        id: img.id,
+        date: new Date(img.timestamp).toISOString().split('T')[0],
+        tags: img.tags,
+        imageUrl,
+        transcript: img.description || '',
+        location: img.latitude && img.longitude
+          ? `${img.latitude.toFixed(4)}, ${img.longitude.toFixed(4)}`
+          : undefined,
+        latitude: img.latitude || undefined,
+        longitude: img.longitude || undefined,
+      };
+    });
 
     return {
       images,
