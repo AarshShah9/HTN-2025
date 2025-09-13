@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
-  padding: 0 2rem;
+  padding: 0 1rem;
   max-width: 1200px;
   margin: 0 auto;
   justify-items: center;
@@ -99,7 +99,7 @@
   .image-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
-    padding: 0 1rem;
+    padding: 0 0.75rem;
   }
   
   .image {
@@ -112,7 +112,7 @@
   
   .no-results {
     padding: 3rem 1rem;
-    margin: 0 1rem;
+    margin: 0 0.75rem;
   }
 }
 
@@ -120,7 +120,7 @@
   .image-grid {
     grid-template-columns: 1fr;
     gap: 1.25rem;
-    padding: 0 0.75rem;
+    padding: 0 0.5rem;
   }
   
   .image-card {
@@ -142,6 +142,6 @@
   
   .no-results {
     padding: 2.5rem 1rem;
-    margin: 0 0.75rem;
+    margin: 0 0.5rem;
   }
 }

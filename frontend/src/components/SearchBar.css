@@ -2,10 +2,11 @@
   width: 100%;
   max-width: 800px;
   margin: 0 auto 2.5rem auto;
-  padding: 0 2rem;
+  padding: 0 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .search-bar {
@@ -58,7 +59,7 @@
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .search-bar-container {
-    padding: 0 1rem;
+    padding: 0 0.75rem;
     margin-bottom: 2rem;
   }
   
@@ -75,7 +76,7 @@
 
 @media (max-width: 480px) {
   .search-bar-container {
-    padding: 0 0.75rem;
+    padding: 0 0.5rem;
     margin-bottom: 1.5rem;
   }
   
