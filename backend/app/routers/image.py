@@ -56,7 +56,7 @@ def get_audio_repository(
 
 @router.post("/upload", response_model=ImageResponse)
 async def upload_image(
-    base64_data: list[str],
+    frames: list[str],
     audio: str,
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
@@ -70,8 +70,8 @@ async def upload_image(
     and can be processed later by AI services.
 
     Args:
-        base64_data: Base64 encoded image data as string
-        audio: Optional base64 encoded WAV audio to be transcribed and stored separately
+        frames: Base64 encoded image data as string
+        audio: Base64 encoded WAV audio to be transcribed and stored separately
         latitude: Optional GPS latitude coordinate
         longitude: Optional GPS longitude coordinate
         repository: Image repository for database operations
@@ -83,33 +83,34 @@ async def upload_image(
     Raises:
         HTTPException: If file saving or database operation fails
     """
-    # Process audio transcription if audio is provided
-    audio_id = None
-    if audio:
-        try:
-            # Decode base64 audio to bytes
-            audio_bytes = base64.b64decode(audio)
-            # Transcribe audio using the transcription utility
-            transcription = transcribe_audio_from_bytes(audio_bytes, "audio.wav")
-            # Create audio record in database
-            audio_record = await audio_repository.create_audio(
-                transcription=transcription
-            )
-            audio_id = str(audio_record.id)
-        except Exception as e:
-            print(f"Error transcribing audio: {str(e)}")
-            # Create audio record without transcription if transcription fails
-            audio_record = await audio_repository.create_audio(transcription=None)
-            audio_id = str(audio_record.id)
+    # Process audio transcription - audio is required
+    if not audio or audio.strip() == "":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Audio data is required"
+        )
 
-    if not base64_data:
+    try:
+        # Decode base64 audio to bytes
+        audio_bytes = base64.b64decode(audio)
+        # Transcribe audio using the transcription utility
+        transcription = transcribe_audio_from_bytes(audio_bytes, "audio.wav")
+        # Create audio record in database
+        audio_record = await audio_repository.create_audio(transcription=transcription)
+        audio_id = str(audio_record.id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to process audio: {str(e)}",
+        )
+
+    if not frames:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="No image data provided"
         )
 
     # Generate unique ID for the image
     image_record = None
-    for image in base64_data:
+    for image in frames:
         image_id = str(uuid.uuid4())
 
         # Define filename and filepath for storage
