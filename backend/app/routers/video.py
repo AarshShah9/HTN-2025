@@ -4,7 +4,7 @@ from database.database import get_db_session
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.models import VideoCreate, VideoResponse, VideoUpdate
+from app.models.models import VideoCreate, VideoResponse
 from app.repository.audio_repository import AudioRepository
 from app.repository.video_repository import VideoRepository
 from app.utils.transcription import transcribe_audio_from_bytes
@@ -125,120 +125,6 @@ async def search_videos_by_tags(
     return [VideoResponse.model_validate(video) for video in videos]
 
 
-@router.get("/search/by-duration", response_model=List[VideoResponse])
-async def search_videos_by_duration(
-    min_duration: Optional[float] = None,
-    max_duration: Optional[float] = None,
-    skip: int = 0,
-    limit: int = 100,
-    repository: VideoRepository = Depends(get_video_repository),
-):
-    """Search videos by duration range."""
-    if min_duration is not None and min_duration < 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Minimum duration must be non-negative",
-        )
-    if max_duration is not None and max_duration < 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Maximum duration must be non-negative",
-        )
-    if (
-        min_duration is not None
-        and max_duration is not None
-        and min_duration > max_duration
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Minimum duration cannot be greater than maximum duration",
-        )
-
-    videos = await repository.get_videos_by_duration_range(
-        min_duration=min_duration, max_duration=max_duration, skip=skip, limit=limit
-    )
-    return [VideoResponse.model_validate(video) for video in videos]
-
-
-@router.get("/search/by-frame-count", response_model=List[VideoResponse])
-async def search_videos_by_frame_count(
-    min_frames: Optional[int] = None,
-    max_frames: Optional[int] = None,
-    skip: int = 0,
-    limit: int = 100,
-    repository: VideoRepository = Depends(get_video_repository),
-):
-    """Search videos by frame count range."""
-    if min_frames is not None and min_frames < 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Minimum frame count must be non-negative",
-        )
-    if max_frames is not None and max_frames < 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Maximum frame count must be non-negative",
-        )
-    if min_frames is not None and max_frames is not None and min_frames > max_frames:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Minimum frame count cannot be greater than maximum frame count",
-        )
-
-    videos = await repository.get_videos_by_frame_count_range(
-        min_frames=min_frames, max_frames=max_frames, skip=skip, limit=limit
-    )
-    return [VideoResponse.model_validate(video) for video in videos]
-
-
-@router.put("/{video_id}", response_model=VideoResponse)
-async def update_video(
-    video_id: str,
-    video_update: VideoUpdate,
-    video_repo: VideoRepository = Depends(get_video_repository),
-    audio_repo: AudioRepository = Depends(get_audio_repository)
-):
-    """Update a video record with optional audio.
-    
-    If audio is provided, it will be transcribed and a new audio record will be created,
-    and the video will be linked to the new audio record.
-    """
-    try:
-        # Convert Pydantic model to dict, excluding unset fields
-        update_data = video_update.model_dump(exclude_unset=True)
-        
-        # Handle audio if provided
-        if 'audio' in update_data:
-            try:
-                # Transcribe the audio
-                audio_bytes = base64.b64decode(update_data.pop('audio'))
-                transcription = transcribe_audio_from_bytes(audio_bytes)
-                
-                # Create new audio record
-                audio = await audio_repo.create_audio(
-                    transcription=transcription
-                )
-                update_data['audio_id'] = str(audio.id)
-            except Exception as e:
-                # Log the error but don't fail the video update
-                print(f"Error processing audio: {str(e)}")
-        
-        # Remove None values to prevent overwriting with None unless explicitly set
-        update_data = {k: v for k, v in update_data.items() if v is not None}
-        
-        video = await video_repo.update_video(video_id, update_data)
-        if not video:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Video not found"
-            )
-        return VideoResponse.model_validate(video)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to update video: {str(e)}",
-        )
-
-
 @router.delete("/{video_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_video(
     video_id: str, repository: VideoRepository = Depends(get_video_repository)
@@ -270,8 +156,8 @@ async def get_video_locations(
     return locations
 
 
-@router.get("/videos_by_audio")
-async def get_videos_by_audio(
+@router.get("/videos_by_embedding")
+async def get_videos_by_embedding(
     audio_description: str,
     video_repo: VideoRepository = Depends(get_video_repository),
     audio_repo: AudioRepository = Depends(get_audio_repository)
@@ -307,3 +193,4 @@ async def get_videos_by_audio(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to search videos by audio: {str(e)}",
         )
+        
