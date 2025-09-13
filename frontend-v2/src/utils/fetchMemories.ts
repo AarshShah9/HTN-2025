@@ -7,31 +7,61 @@ export type MemoriesData = {
   totalCount: number;
 };
 
+// Backend API response type
+interface BackendImageResponse {
+  id: string;
+  path: string;
+  timestamp: string;
+  description: string | null;
+  tags: string[];
+  embeddings: Record<string, unknown> | null;
+  tagged: boolean;
+  audio_id: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
 /**
  * Fetches all memories from the backend
  * @returns Promise<MemoriesData> Object containing memories array and total count
  */
 export const fetchMemories = async (): Promise<MemoriesData> => {
   try {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // In a real application, this would make an API call to your backend
-    // const response = await fetch('/api/memories');
-    // const memoriesData = await response.json();
-
-    // Simulate occasional errors (5% chance)
-    if (Math.random() < 0.05) {
-      throw new Error('Failed to fetch memories. Please try again.');
+    // Make API call to backend
+    const response = await fetch('http://localhost:8000/image/');
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch memories: ${response.status} ${response.statusText}`);
     }
 
-    // For now, return mock data
+    const backendImages: BackendImageResponse[] = await response.json();
+
+    // Map backend response to frontend types
+    const images: MemoryImage[] = backendImages.map((img) => ({
+      id: img.id,
+      date: new Date(img.timestamp).toISOString().split('T')[0], // Convert to YYYY-MM-DD format
+      tags: img.tags,
+      imageUrl: `http://localhost:8000/images/${img.path}`, // Construct full image URL
+      transcript: img.description || '', // Use description as transcript for now
+      location: img.latitude && img.longitude 
+        ? `${img.latitude.toFixed(4)}, ${img.longitude.toFixed(4)}` 
+        : undefined,
+      latitude: img.latitude || undefined,
+      longitude: img.longitude || undefined,
+      people: [] // Could be derived from tags in the future
+    }));
+
+    return {
+      images,
+      totalCount: images.length
+    };
+  } catch (error) {
+    console.error('Error fetching memories from backend:', error);
+    // Fallback to mock data if backend is not available
+    console.log('Falling back to mock data');
     return {
       images: mockImages,
       totalCount: mockImages.length
     };
-  } catch (error) {
-    console.error('Error fetching memories:', error);
-    throw error;
   }
 };
