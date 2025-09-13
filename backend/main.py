@@ -4,6 +4,8 @@ import os
 from typing import List
 
 from app.routers.image import router as image_router
+from app.routers.image_db import router as image_db_router
+from database.database import init_db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -11,6 +13,10 @@ from fastapi.staticfiles import StaticFiles
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Initialize database
+    await init_db()
+    print("Database initialized")
+    
     # Background tasks storage
     background_tasks: List[asyncio.Task] = []
 
@@ -53,6 +59,7 @@ app.mount("/images", StaticFiles(directory="images"), name="images")
 
 # Include routers
 app.include_router(image_router)
+app.include_router(image_db_router)
 
 
 @app.get("/")
