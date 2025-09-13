@@ -8,19 +8,18 @@ and the database, implementing the Repository pattern for:
 - Data validation and error handling
 """
 
-import base64
 import sys
 
 sys.path.append("../..")
 from datetime import datetime
-from typing import List, Optional, Union, Dict, Any, Tuple
+from typing import List, Optional, Tuple, Union
 from uuid import UUID
-from sqlalchemy import select, or_
-from sqlalchemy.ext.asyncio import AsyncSession
-from database.models import ImageModel, AudioModel
-from ..utils.embedding import generate_text_embedding, calculate_cosine_similarity
 
-from app.utils.transcription import transcribe_audio_from_bytes
+from database.models import AudioModel, ImageModel
+from sqlalchemy import delete, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ..utils.embedding import calculate_cosine_similarity, generate_text_embedding
 
 
 class ImageRepository:
@@ -73,7 +72,6 @@ class ImageRepository:
         """
         if tags is None:
             tags = []
-
 
         # Create new image model instance
         image = ImageModel(
@@ -153,54 +151,50 @@ class ImageRepository:
         return list(result.scalars().all())
 
     async def search_similar_audio_embeddings(
-        self, 
-        query_embedding: List[float], 
-        limit: int = 2
+        self, query_embedding: List[float], limit: int = 2
     ) -> List[Tuple[ImageModel, float]]:
         """Find images with audio embeddings most similar to the query embedding.
-        
+
         Args:
             query_embedding: The embedding vector to compare against
             limit: Maximum number of results to return
-            
+
         Returns:
-            List of tuples containing (image, similarity_score) pairs, 
+            List of tuples containing (image, similarity_score) pairs,
             ordered by similarity (highest first)
         """
         if not query_embedding:
             return []
-            
+
         # Get all audio records with embeddings and their associated images
         result = await self.session.execute(
             select(ImageModel, AudioModel.embedding)
             .join(AudioModel, ImageModel.audio_id == AudioModel.id)
-            .where(AudioModel.embedding.isnot(None))
+            .where(AudioModel.embedding.is_not(None))
         )
-        
+
         # Calculate similarity scores for each audio embedding
         scored_images = []
         for img, audio_embedding in result.all():
             if not audio_embedding:
                 continue
-                
+
             similarity = calculate_cosine_similarity(query_embedding, audio_embedding)
             scored_images.append((img, similarity))
-        
+
         # Sort by similarity score (highest first) and return top results
         scored_images.sort(key=lambda x: x[1], reverse=True)
         return scored_images[:limit]
-        
+
     async def get_images_by_audio(
-        self, 
-        audio_description: str,
-        limit: int = 2
+        self, audio_description: str, limit: int = 2
     ) -> List[ImageModel]:
         """Find images with audio transcriptions most similar to the given description.
-        
+
         Args:
             audio_description: Text description to search for
             limit: Maximum number of results to return
-            
+
         Returns:
             List of images ordered by audio similarity (most similar first)
         """
@@ -208,16 +202,15 @@ class ImageRepository:
         query_embedding = generate_text_embedding(audio_description)
         if not query_embedding:
             return []
-            
+
         # Get similar audio embeddings and return corresponding images
         similar_audio = await self.search_similar_audio_embeddings(
-            query_embedding=query_embedding,
-            limit=limit
+            query_embedding=query_embedding, limit=limit
         )
-        
+
         # Extract just the images (discard similarity scores)
         return [img for img, _ in similar_audio]
-    
+
     async def search_images_by_tags(
         self, tags: List[str], skip: int = 0, limit: int = 100
     ) -> List[ImageModel]:
