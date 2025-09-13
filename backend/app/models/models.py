@@ -43,12 +43,11 @@ class ImageResponse(ImageBase):
 class VideoBase(BaseModel):
     description: Optional[str] = None
     tags: List[str] = Field(default_factory=list)
-    embeddings: Optional[Dict[str, Any]] = None
     tagged: bool = False
     fps: float = Field(default=60.0, gt=0)
     duration: Optional[float] = Field(default=None, ge=0)
-    audio: Optional[str] = Field(
-        default=None, description="Base64 encoded WAV audio at 44100 sample rate"
+    audio_id: Optional[str] = Field(
+        default=None, description="Reference to AudioModel ID"
     )
     latitude: Optional[float] = Field(default=None, ge=-90, le=90)
     longitude: Optional[float] = Field(default=None, ge=-180, le=180)
@@ -63,12 +62,11 @@ class VideoCreate(VideoBase):
 class VideoUpdate(BaseModel):
     description: Optional[str] = None
     tags: Optional[List[str]] = None
-    embeddings: Optional[Dict[str, Any]] = None
     tagged: Optional[bool] = None
     fps: Optional[float] = Field(default=None, gt=0)
     duration: Optional[float] = Field(default=None, ge=0)
-    audio: Optional[str] = Field(
-        default=None, description="Base64 encoded WAV audio at 44100 sample rate"
+    audio_id: Optional[str] = Field(
+        default=None, description="Reference to AudioModel ID"
     )
 
 

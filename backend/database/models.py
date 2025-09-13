@@ -102,19 +102,18 @@ class VideoModel(Base):
     This model stores comprehensive information about videos including:
     - Video frames as base64 strings (60fps)
     - AI-generated descriptions and tags
-    - Vector embeddings for semantic search
     - GPS coordinates for location-based features
     - Processing status tracking
+    - Reference to audio transcription
 
     Attributes:
         id (str): Unique UUID identifier for the video
         timestamp (datetime): When the video record was created
         tagged (bool): Whether AI processing has been completed
-        embeddings (dict): Vector embeddings for semantic search
         description (str): AI-generated natural language description
         frames (list): List of base64 encoded video frames at 60fps
         tags (list): List of AI-generated descriptive tags
-        audio (str): Base64 encoded WAV audio at 44100 sample rate (optional)
+        audio_id (str): Reference to AudioModel ID (optional)
         latitude (float): GPS latitude coordinate (optional)
         longitude (float): GPS longitude coordinate (optional)
         fps (int): Frames per second (default: 60)
@@ -137,7 +136,6 @@ class VideoModel(Base):
     tagged = Column(Boolean, default=False, nullable=False)  # Processing status
 
     # AI-generated content
-    embeddings = Column(JSON, nullable=True)  # Vector embeddings for search
     description = Column(Text, nullable=True)  # Natural language description
     tags = Column(JSON, default=list, nullable=False)  # Descriptive tags array
 
@@ -146,8 +144,8 @@ class VideoModel(Base):
     fps = Column(Float, default=60.0, nullable=False)  # Frames per second
     duration = Column(Float, nullable=True)  # Duration in seconds
 
-    # Audio data (optional)
-    audio = Column(Text, nullable=True)  # Base64 encoded WAV audio at 44100 sample rate
+    # Audio reference
+    audio_id = Column(String(36), nullable=True)  # Reference to AudioModel ID
 
     # Location data (optional)
     latitude = Column(Float, nullable=True)  # GPS coordinates

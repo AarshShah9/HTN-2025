@@ -45,11 +45,10 @@ class VideoRepository:
         frames: List[str],
         description: Optional[str] = None,
         tags: Optional[List[str]] = None,
-        embeddings: Optional[dict] = None,
         tagged: bool = False,
         fps: float = 60.0,
         duration: Optional[float] = None,
-        audio: Optional[str] = None,
+        audio_id: Optional[str] = None,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
     ) -> VideoModel:
@@ -59,11 +58,10 @@ class VideoRepository:
             frames: List of base64 encoded video frames
             description: Optional natural language description
             tags: List of descriptive tags (defaults to empty list)
-            embeddings: Optional vector embeddings for semantic search
             tagged: Whether the video has been processed by AI (default: False)
             fps: Frames per second (default: 60.0)
             duration: Optional video duration in seconds
-            audio: Optional base64 encoded WAV audio at 44100 sample rate
+            audio_id: Optional reference to AudioModel ID
             latitude: Optional GPS latitude coordinate
             longitude: Optional GPS longitude coordinate
 
@@ -85,11 +83,10 @@ class VideoRepository:
             frames=frames,
             description=description,
             tags=tags,
-            embeddings=embeddings,
             tagged=tagged,
             fps=fps,
             duration=duration,
-            audio=audio,
+            audio_id=audio_id,
             timestamp=datetime.utcnow(),
             latitude=latitude,
             longitude=longitude,
@@ -240,14 +237,38 @@ class VideoRepository:
         )
         return len(list(result.scalars().all()))
 
-    async def get_video_locations(self) -> List[tuple[float, float]]:
-        """Get all video locations."""
+    async def get_video_locations(self) -> List[dict]:
+        """Get all unique video locations with coordinates.
+
+        Returns:
+            List[dict]: List of dictionaries with id, latitude, and longitude
+        """
         result = await self.session.execute(
-            select(VideoModel.latitude, VideoModel.longitude)
-            .where(VideoModel.latitude.is_not_none())
-            .where(VideoModel.longitude.is_not_none())
+            select(
+                VideoModel.id,
+                VideoModel.latitude,
+                VideoModel.longitude,
+            )
+            .where(VideoModel.latitude.isnot(None))
+            .where(VideoModel.longitude.isnot(None))
         )
-        return list(result.scalars().all())
+        return [
+            {"id": row[0], "latitude": row[1], "longitude": row[2]} for row in result.all()
+        ]
+
+    async def get_video_by_audio_id(self, audio_id: str) -> Optional[VideoModel]:
+        """Get a video by its associated audio ID.
+
+        Args:
+            audio_id: The ID of the associated audio
+
+        Returns:
+            Optional[VideoModel]: The video if found, None otherwise
+        """
+        result = await self.session.execute(
+            select(VideoModel).where(VideoModel.audio_id == audio_id)
+        )
+        return result.scalar_one_or_none()
 
     async def get_videos_by_duration_range(
         self,

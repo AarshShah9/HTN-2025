@@ -5,9 +5,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.models import VideoCreate, VideoResponse, VideoUpdate
+from app.repository.audio_repository import AudioRepository
 from app.repository.video_repository import VideoRepository
+from app.utils.transcription import transcribe_audio_from_bytes
+import base64
 
-router = APIRouter(prefix="/api/video", tags=["videos"])
+router = APIRouter(prefix="/video", tags=["videos"])
 
 
 def get_video_repository(
@@ -16,21 +19,51 @@ def get_video_repository(
     return VideoRepository(session)
 
 
+def get_audio_repository(
+    session: AsyncSession = Depends(get_db_session),
+) -> AudioRepository:
+    return AudioRepository(session)
+
+
 @router.post("/", response_model=VideoResponse, status_code=status.HTTP_201_CREATED)
 async def create_video(
-    video_data: VideoCreate, repository: VideoRepository = Depends(get_video_repository)
+    video_data: VideoCreate, 
+    video_repo: VideoRepository = Depends(get_video_repository),
+    audio_repo: AudioRepository = Depends(get_audio_repository)
 ):
-    """Create a new video record."""
+    """Create a new video record with optional audio.
+    
+    If audio is provided, it will be transcribed and stored in the audio table,
+    and the video will be linked to the audio record.
+    """
     try:
-        video = await repository.create_video(
+        audio_id = None
+        
+        # Handle audio if provided
+        if video_data.audio:
+            try:
+                # Transcribe the audio
+                audio_bytes = base64.b64decode(video_data.audio)
+                transcription = transcribe_audio_from_bytes(audio_bytes)
+                
+                # Create audio record
+                audio = await audio_repo.create_audio(
+                    transcription=transcription
+                )
+                audio_id = str(audio.id)
+            except Exception as e:
+                # Log the error but don't fail the video creation
+                print(f"Error processing audio: {str(e)}")
+        
+        # Create video record
+        video = await video_repo.create_video(
             frames=video_data.frames,
             description=video_data.description,
             tags=video_data.tags,
-            embeddings=video_data.embeddings,
             tagged=video_data.tagged,
             fps=video_data.fps,
             duration=video_data.duration,
-            audio=video_data.audio,
+            audio_id=audio_id,
             latitude=video_data.latitude,
             longitude=video_data.longitude,
         )
@@ -162,26 +195,48 @@ async def search_videos_by_frame_count(
 async def update_video(
     video_id: str,
     video_update: VideoUpdate,
-    repository: VideoRepository = Depends(get_video_repository),
+    video_repo: VideoRepository = Depends(get_video_repository),
+    audio_repo: AudioRepository = Depends(get_audio_repository)
 ):
-    """Update a video record."""
-    updated_video = await repository.update_video(
-        video_id=video_id,
-        description=video_update.description,
-        tags=video_update.tags,
-        embeddings=video_update.embeddings,
-        tagged=video_update.tagged,
-        fps=video_update.fps,
-        duration=video_update.duration,
-        audio=video_update.audio,
-    )
-
-    if not updated_video:
+    """Update a video record with optional audio.
+    
+    If audio is provided, it will be transcribed and a new audio record will be created,
+    and the video will be linked to the new audio record.
+    """
+    try:
+        # Convert Pydantic model to dict, excluding unset fields
+        update_data = video_update.model_dump(exclude_unset=True)
+        
+        # Handle audio if provided
+        if 'audio' in update_data:
+            try:
+                # Transcribe the audio
+                audio_bytes = base64.b64decode(update_data.pop('audio'))
+                transcription = transcribe_audio_from_bytes(audio_bytes)
+                
+                # Create new audio record
+                audio = await audio_repo.create_audio(
+                    transcription=transcription
+                )
+                update_data['audio_id'] = str(audio.id)
+            except Exception as e:
+                # Log the error but don't fail the video update
+                print(f"Error processing audio: {str(e)}")
+        
+        # Remove None values to prevent overwriting with None unless explicitly set
+        update_data = {k: v for k, v in update_data.items() if v is not None}
+        
+        video = await video_repo.update_video(video_id, update_data)
+        if not video:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Video not found"
+            )
+        return VideoResponse.model_validate(video)
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Video not found"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to update video: {str(e)}",
         )
-
-    return VideoResponse.model_validate(updated_video)
 
 
 @router.delete("/{video_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -216,13 +271,39 @@ async def get_video_locations(
 
 
 @router.get("/videos_by_audio")
-def get_videos_by_audio(audio_description: str):
+async def get_videos_by_audio(
+    audio_description: str,
+    video_repo: VideoRepository = Depends(get_video_repository),
+    audio_repo: AudioRepository = Depends(get_audio_repository)
+):
     """
     Search for videos based on audio description.
-    This endpoint matches the audio description against video descriptions and tags.
+    This endpoint matches the audio description against audio transcriptions.
     """
-    # Placeholder for future implementation
-    return {
-        "message": "Audio-based video search not yet implemented",
-        "query": audio_description,
-    }
+    try:
+        # Generate embedding for the search query
+        from app.utils.embedding import generate_text_embedding
+        query_embedding = generate_text_embedding(audio_description)
+        
+        # Search for similar audio transcriptions
+        similar_audios = await audio_repo.search_similar_audios(
+            query_embedding=query_embedding,
+            limit=10
+        )
+        
+        # Get video IDs from the audio records
+        video_ids = [audio.video_id for audio in similar_audios]
+        
+        # Get the videos for the matching audio IDs
+        videos = []
+        for video_id in video_ids:
+            video = await video_repo.get_video_by_id(video_id)
+            if video:
+                videos.append(video)
+        
+        return [VideoResponse.model_validate(video) for video in videos]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to search videos by audio: {str(e)}",
+        )
