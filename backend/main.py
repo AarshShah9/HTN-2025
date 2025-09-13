@@ -62,7 +62,7 @@ app = FastAPI(
     title="HTN 2025 - AI-Powered Memory Gallery",
     description="A sophisticated image management system with AI-powered tagging and search",
     version="1.0.0",
-    # lifespan=lifespan,
+    lifespan=lifespan,
     debug=True
 )
 
@@ -79,7 +79,7 @@ app.add_middleware(
 os.makedirs("images", exist_ok=True)
 
 # Mount static files for images
-# app.mount("/images", StaticFiles(directory="images"), name="images")
+app.mount("/images", StaticFiles(directory="images"), name="images")
 
 # Include routers
 app.include_router(image_router)
@@ -99,20 +99,3 @@ def read_root():
         "status": "active",
         "docs": "/docs",
     }
-
-
-# Development server startup
-if __name__ == "__main__":
-    import uvicorn
-
-    # Run the application with uvicorn for development
-    # In production, use a proper ASGI server like gunicorn with uvicorn workers
-    app.config['MAX_CONTENT_LENGTH'] = None
-
-
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8000,
-        reload=True,  # Enable auto-reload for development
-    )

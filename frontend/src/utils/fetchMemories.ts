@@ -1,4 +1,5 @@
 // Mock memories data for demonstration - in a real app, these would come from your backend
+import { API_URL } from '../constants';
 import { mockImages } from '../lib/mockData';
 import type { MemoryImage } from '../lib/types';
 
@@ -28,7 +29,7 @@ interface BackendImageResponse {
 export const fetchMemories = async (): Promise<MemoriesData> => {
   try {
     // Make API call to backend
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/image/`);
+    const response = await fetch(`${API_URL}/image/`);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch memories: ${response.status} ${response.statusText}`);
@@ -41,7 +42,7 @@ export const fetchMemories = async (): Promise<MemoriesData> => {
       id: img.id,
       date: new Date(img.timestamp).toISOString().split('T')[0], // Convert to YYYY-MM-DD format
       tags: img.tags,
-      imageUrl: `${import.meta.env.VITE_API_URL}/images/${img.path}`, // Construct full image URL
+      imageUrl: `${API_URL}/images/${img.path}`, // Construct full image URL
       transcript: img.description || '', // Use description as transcript for now
       location: img.latitude && img.longitude 
         ? `${img.latitude.toFixed(4)}, ${img.longitude.toFixed(4)}` 
