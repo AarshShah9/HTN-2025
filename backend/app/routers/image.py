@@ -9,6 +9,7 @@ This module handles image upload functionality, including:
 
 import os
 import uuid
+import base64
 from typing import List, Optional
 
 from database.database import get_db_session
@@ -17,6 +18,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..models.models import ImageResponse, ImageUpdate
 from ..repository.image_repository import ImageRepository
+from ..repository.audio_repository import AudioRepository
+from ..utils.transcription import transcribe_audio_from_bytes
 
 # Create router with image-specific prefix and tags
 router = APIRouter(prefix="/image", tags=["image"])
@@ -35,12 +38,26 @@ def get_image_repository(
     """
     return ImageRepository(session)
 
+def get_audio_repository(
+    session: AsyncSession = Depends(get_db_session),
+) -> AudioRepository:
+    """Dependency function to provide AudioRepository instance.
+
+    Args:
+        session: Database session from dependency injection
+
+    Returns:
+        AudioRepository: Repository instance for audio operations
+    """
+    return AudioRepository(session)
+
 
 @router.post("/upload", response_model=ImageResponse)
 async def upload_image(
-    base64_data: str,
-    audio: Optional[str] = None,
+    base64_data: list[str],
+    audio: str,
     repository: ImageRepository = Depends(get_image_repository),
+    audio_repository: AudioRepository = Depends(get_audio_repository),
 ):
     """Upload an image from base64 encoded data.
 
@@ -50,8 +67,9 @@ async def upload_image(
 
     Args:
         base64_data: Base64 encoded image data as string
-        audio: Optional base64 encoded WAV audio to be transcribed
+        audio: Optional base64 encoded WAV audio to be transcribed and stored separately
         repository: Image repository for database operations
+        audio_repository: Audio repository for database operations
 
     Returns:
         ImageResponse: Created image record with metadata
@@ -59,29 +77,47 @@ async def upload_image(
     Raises:
         HTTPException: If file saving or database operation fails
     """
+    # Process audio transcription if audio is provided
+    audio_id = None
+    if audio:
+        try:
+            # Decode base64 audio to bytes
+            audio_bytes = base64.b64decode(audio)
+            # Transcribe audio using the transcription utility
+            transcription = transcribe_audio_from_bytes(audio_bytes, "audio.wav")
+            # Create audio record in database
+            audio_record = await audio_repository.create_audio(transcription=transcription)
+            audio_id = audio_record.id
+        except Exception as e:
+            print(f"Error transcribing audio: {str(e)}")
+            # Create audio record without transcription if transcription fails
+            audio_record = await audio_repository.create_audio(transcription=None)
+            audio_id = audio_record.id
+
     # Generate unique ID for the image
-    image_id = str(uuid.uuid4())
+    for image in base64_data:
+        image_id = str(uuid.uuid4())
 
-    # Define filename and filepath for storage
-    filename = f"{image_id}.b64"
-    filepath = os.path.join("images", filename)
+        # Define filename and filepath for storage
+        filename = f"{image_id}.b64"
+        filepath = os.path.join("images", filename)
 
-    # Ensure images directory exists
-    os.makedirs("images", exist_ok=True)
+        # Ensure images directory exists
+        os.makedirs("images", exist_ok=True)
 
-    # Save base64 data to file system
-    with open(filepath, "w") as f:
-        f.write(base64_data)
+        # Save base64 data to file system
+        with open(filepath, "w") as f:
+            f.write(image)
 
-    # Create image record in database with initial metadata
-    image_record = await repository.create_image(
-        path=filename,  # Store relative path to the file
-        description=None,  # No description initially
-        tags=[],  # Empty tags initially
-        embeddings=None,  # No embeddings initially
-        tagged=False,  # Not processed by AI yet
-        audio=audio,  # Optional base64 encoded WAV audio
-    )
+        # Create image record in database with initial metadata
+        image_record = await repository.create_image(
+            path=filename,  # Store relative path to the file
+            description=None,  # No description initially
+            tags=[],  # Empty tags initially
+            embeddings=None,  # No embeddings initially
+            tagged=False,  # Not processed by AI yet
+            audio_id=audio_id,  # Reference to AudioModel ID
+        )
 
     # Return the created image record as response model
     return ImageResponse.from_orm(image_record)
@@ -178,6 +214,7 @@ async def update_image(
         tags=image_update.tags,
         embeddings=image_update.embeddings,
         tagged=image_update.tagged,
+        audio_id=image_update.audio_id,
     )
 
     if not updated_image:

@@ -13,7 +13,6 @@ from contextlib import asynccontextmanager
 import os
 from typing import List
 
-from app.routers.image_db import router as image_db_router
 from app.routers.image import router as image_router
 from app.routers.video import router as video_router
 from database.database import init_db
@@ -92,7 +91,6 @@ os.makedirs("images", exist_ok=True)
 app.mount("/images", StaticFiles(directory="images"), name="images")
 
 # Include routers
-app.include_router(image_db_router)
 app.include_router(image_router)
 app.include_router(video_router)
 
