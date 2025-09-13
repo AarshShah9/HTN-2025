@@ -13,4 +13,3 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set in .env file")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
