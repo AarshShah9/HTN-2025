@@ -1,4 +1,5 @@
 import os
+import json
 from typing import List, Dict, Any
 import google.generativeai as genai
 from PIL import Image
@@ -9,7 +10,7 @@ def get_image_tags_batch_as_parts(
 ) -> Dict[str, Any]:
     """
     Implementation that sends all images at once as a multipart prompt,
-    using structured output to force JSON format.
+    forcing JSON format output through prompt engineering.
     
     Args:
         image_paths: List of paths to image files
@@ -19,16 +20,16 @@ def get_image_tags_batch_as_parts(
         Dictionary with results for batch analysis
     """
     # Configure the Gemini API
-    api_key = os.environ.get("GOOGLE_API_KEY")
+    # api_key = os.environ.get("GOOGLE_API_KEY")
+    api_key = "AIzaSyBUh6GPvo30h-qkC9w5o-haF_GO3fdMfQU"
     if not api_key:
         raise ValueError("API key must be provided or set as GOOGLE_API_KEY environment variable")
     genai.configure(api_key=api_key)
     
-    # Initialize the model with specific settings for JSON output
+    # Initialize the model with specific settings for more deterministic output
     generation_config = {
         "temperature": 0.1,  # Low temperature for more deterministic output
-        "max_output_tokens": 4096,
-        "response_mime_type": "application/json",
+        "max_output_tokens": 4096
     }
     
     model = genai.GenerativeModel(
@@ -40,53 +41,29 @@ def get_image_tags_batch_as_parts(
     parts = []
     valid_images = []
     
-    # Define schema for the batch response
-    # This represents an array of image analysis objects
-    schema = {
-        "type": "array",
-        "items": {
-            "type": "object",
-            "properties": {
-                "image_index": {
-                    "type": "integer",
-                    "description": "Index of the image in the provided batch (0-based)"
-                },
-                "tags": {
-                    "type": "array",
-                    "description": f"Up to {max_tags} descriptive tags about the image",
-                    "items": {"type": "string"}
-                },
-                "objects": {
-                    "type": "array",
-                    "description": "Objects detected in the image with their approximate locations",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {"type": "string"},
-                            "location": {"type": "string"}
-                        }
-                    }
-                },
-                "scene_type": {
-                    "type": "string",
-                    "description": "Type of scene (indoor, outdoor, urban, nature, etc.)"
-                },
-                "colors": {
-                    "type": "array",
-                    "description": "Dominant colors in the image",
-                    "items": {"type": "string"}
-                },
-                "description": {
-                    "type": "string",
-                    "description": "Brief description of the image content"
-                }
-            },
-            "required": ["image_index", "tags", "objects", "scene_type", "colors", "description"]
-        }
-    }
+    # Create the text prompt that specifies the exact JSON structure we want
+    text_prompt = f"""
+    Analyze these {len(image_paths)} images and provide detailed information about each one.
     
-    # Create the text prompt
-    text_prompt = f"Analyze these {len(image_paths)} images and provide detailed information about each one."
+    Return ONLY a valid JSON array with one object per image, where each object has this exact structure:
+    
+    {{
+      "image_index": <index of image starting from 0>,
+      "tags": [<up to {max_tags} descriptive tags as strings>],
+      "objects": [
+        {{
+          "name": "<object name>",
+          "location": "<location in image>"
+        }}
+      ],
+      "scene_type": "<type of scene: indoor, outdoor, urban, nature, etc.>",
+      "colors": [<dominant colors as strings>],
+      "description": "<brief description of image content>"
+    }}
+    
+    Only respond with the raw JSON array, with no markdown formatting, no code blocks, no explanations.
+    The response must start with '[' and end with ']' and be valid JSON that can be parsed directly.
+    """
     parts.append(text_prompt)
     
     # Add each image as a part
@@ -102,21 +79,28 @@ def get_image_tags_batch_as_parts(
         return {"error": "No valid images provided"}
     
     try:
-        # Process with Gemini using the schema for structured output
-        response = model.generate_content(
-            contents=parts,
-            response_schema=schema
-        )
+        # Process with Gemini
+        response = model.generate_content(contents=parts)
         
-        # Extract data from the structured response
-        batch_results = response.candidates[0].content.parts[0].function_call.args
-        
-        # Map results to original filenames
-        results = {
-            "batch_results": batch_results,
-            "image_paths": valid_images
-        }
-        return results
+        # Extract JSON from the response text
+        try:
+            response_text = response.text
+            # Remove any markdown code block indicators if present
+            response_text = response_text.replace("```json", "").replace("```", "").strip()
+            batch_results = json.loads(response_text)
+            
+            # Map results to original filenames
+            results = {
+                "batch_results": batch_results,
+                "image_paths": valid_images
+            }
+            return results
+            
+        except json.JSONDecodeError as e:
+            return {
+                "error": f"Failed to parse JSON response: {str(e)}",
+                "raw_response": response.text
+            }
             
     except Exception as e:
         return {"error": str(e)}
