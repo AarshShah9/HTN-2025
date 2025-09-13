@@ -57,7 +57,7 @@ export const fetchMemories = async (): Promise<MemoriesData> => {
         date: new Date(img.timestamp).toISOString().split('T')[0],
         tags: img.tags,
         imageUrl,
-        transcript: img.description || '',
+        description: img.description || '',
         location: img.latitude && img.longitude
           ? `${img.latitude.toFixed(4)}, ${img.longitude.toFixed(4)}`
           : undefined,

@@ -43,6 +43,7 @@ class ImageInput(BaseModel):
 class ImageResponse(ImageBase):
     id: str  # UUID stored as string
     path: str
+    image: Optional[str] = None  # base64 encoded image data
     timestamp: datetime
 
     model_config = ConfigDict(from_attributes=True)

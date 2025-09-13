@@ -42,7 +42,7 @@ HTN-2025/
 │   ├── database/              # Database models and connection
 │   ├── images/                # Static image storage
 │   └── main.py                # FastAPI application entry point
-├── frontend-v2/               # React frontend application
+├── frontend/                  # React frontend application
 │   ├── src/
 │   │   ├── components/        # React components
 │   │   ├── hooks/             # Custom React hooks
@@ -95,7 +95,7 @@ The backend will be available at `http://localhost:8000`
 
 1. **Navigate to frontend directory**:
    ```bash
-   cd frontend-v2
+   cd frontend
    ```
 
 2. **Install dependencies**:

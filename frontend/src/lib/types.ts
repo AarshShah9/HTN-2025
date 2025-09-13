@@ -3,7 +3,7 @@ export type MemoryImage = {
   date: string;
   tags: string[];
   imageUrl: string;
-  transcript: string;
+  description?: string;
   location?: string;
   latitude?: number;
   longitude?: number;

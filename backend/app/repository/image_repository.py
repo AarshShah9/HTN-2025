@@ -9,13 +9,14 @@ and the database, implementing the Repository pattern for:
 """
 
 import base64
+import os
 import sys
 
 sys.path.append("../..")
 from datetime import datetime
 from typing import List, Optional, Union, Dict, Any, Tuple
 from uuid import UUID
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.models import ImageModel, AudioModel
 from ..utils.embedding import generate_text_embedding, calculate_cosine_similarity
@@ -41,6 +42,50 @@ class ImageRepository:
             session: Async SQLAlchemy session for database operations
         """
         self.session = session
+
+    def _read_image_base64(self, path: str) -> Optional[str]:
+        """Read base64 image data from file.
+        
+        Args:
+            path: Relative path to the image file (e.g., "filename.b64")
+            
+        Returns:
+            Base64 encoded image data or None if file doesn't exist
+        """
+        try:
+            filepath = os.path.join("images", path)
+            if os.path.exists(filepath):
+                with open(filepath, "r") as f:
+                    return f.read().strip()
+            return None
+        except Exception:
+            return None
+
+    def _enrich_image_with_base64(self, image: ImageModel) -> ImageModel:
+        """Enrich an ImageModel with base64 data by reading from file.
+        
+        Args:
+            image: ImageModel instance to enrich
+            
+        Returns:
+            ImageModel with image attribute set to base64 data
+        """
+        # Read base64 data from file and add it to the model
+        base64_data = self._read_image_base64(image.path)
+        # Add the base64 data as a new attribute to the model instance
+        setattr(image, 'image', base64_data)
+        return image
+
+    def _enrich_images_with_base64(self, images: List[ImageModel]) -> List[ImageModel]:
+        """Enrich multiple ImageModel objects with base64 data.
+        
+        Args:
+            images: List of ImageModel instances to enrich
+            
+        Returns:
+            List of ImageModel instances with image attribute set
+        """
+        return [self._enrich_image_with_base64(image) for image in images]
 
     async def create_image(
         self,
@@ -107,14 +152,16 @@ class ImageRepository:
         result = await self.session.execute(
             select(ImageModel).where(ImageModel.id == id_str)
         )
-        return result.scalar_one_or_none()
+        image = result.scalar_one_or_none()
+        return self._enrich_image_with_base64(image) if image else None
 
     async def get_image_by_path(self, path: str) -> Optional[ImageModel]:
         """Get an image by its path."""
         result = await self.session.execute(
             select(ImageModel).where(ImageModel.path == path)
         )
-        return result.scalar_one_or_none()
+        image = result.scalar_one_or_none()
+        return self._enrich_image_with_base64(image) if image else None
 
     async def get_all_images(self, skip: int = 0, limit: int = 100) -> List[ImageModel]:
         """Get all images with pagination."""
@@ -124,7 +171,8 @@ class ImageRepository:
             .offset(skip)
             .limit(limit)
         )
-        return list(result.scalars().all())
+        images = list(result.scalars().all())
+        return self._enrich_images_with_base64(images)
 
     async def get_tagged_images(
         self, skip: int = 0, limit: int = 100
@@ -137,7 +185,8 @@ class ImageRepository:
             .offset(skip)
             .limit(limit)
         )
-        return list(result.scalars().all())
+        images = list(result.scalars().all())
+        return self._enrich_images_with_base64(images)
 
     async def get_untagged_images(
         self, skip: int = 0, limit: int = 100
@@ -150,7 +199,8 @@ class ImageRepository:
             .offset(skip)
             .limit(limit)
         )
-        return list(result.scalars().all())
+        images = list(result.scalars().all())
+        return self._enrich_images_with_base64(images)
 
     async def search_similar_audio_embeddings(
         self, 
@@ -215,8 +265,9 @@ class ImageRepository:
             limit=limit
         )
         
-        # Extract just the images (discard similarity scores)
-        return [img for img, _ in similar_audio]
+        # Extract just the images (discard similarity scores) and enrich with base64
+        images = [img for img, _ in similar_audio]
+        return self._enrich_images_with_base64(images)
     
     async def search_images_by_tags(
         self, tags: List[str], skip: int = 0, limit: int = 100
@@ -238,7 +289,7 @@ class ImageRepository:
             if image.tags is not None and any(tag in image.tags for tag in tags):
                 filtered_images.append(image)
 
-        return filtered_images
+        return self._enrich_images_with_base64(filtered_images)
 
     async def update_image(
         self,
