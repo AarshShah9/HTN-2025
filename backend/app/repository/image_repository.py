@@ -8,6 +8,7 @@ and the database, implementing the Repository pattern for:
 - Data validation and error handling
 """
 
+import os
 import sys
 
 sys.path.append("../..")
@@ -69,7 +70,9 @@ class ImageRepository:
             ImageModel with image attribute set to base64 data
         """
         # Read base64 data from file and add it to the model
-        base64_data = self._read_image_base64(image.path)
+        # Cast to str to help type checker understand this is the actual string value
+        image_path: str = str(image.path)
+        base64_data = self._read_image_base64(image_path)
         # Add the base64 data as a new attribute to the model instance
         setattr(image, "image", base64_data)
         return image
