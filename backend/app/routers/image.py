@@ -195,8 +195,8 @@ async def search_images_by_tags(
     return [ImageResponse.model_validate(image) for image in images]
 
 
-@router.get("/images_by_audio")
-async def get_images_by_audio(
+@router.get("/images_by_embedding")
+async def get_images_by_embedding(
     audio_description: str, limit: int = 2, db: AsyncSession = Depends(get_db_session)
 ):
     """Search for images based on audio description using semantic similarity.
