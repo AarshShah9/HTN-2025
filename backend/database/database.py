@@ -4,7 +4,7 @@ This module provides:
 - Async SQLAlchemy engine setup
 - Database session management
 - Table creation utilities
-- Database initialization functions
+- Database initialization functions for images and videos
 """
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
@@ -12,7 +12,7 @@ from sqlalchemy.orm import DeclarativeBase
 import os
 
 # Database URL - SQLite with async support
-DATABASE_URL = "sqlite+aiosqlite:///./database/images.db"
+DATABASE_URL = "sqlite+aiosqlite:///./database/media.db"
 
 # Create async engine
 engine = create_async_engine(

@@ -24,3 +24,33 @@ class ImageResponse(ImageBase):
     
     class Config:
         from_attributes = True
+
+
+class VideoBase(BaseModel):
+    description: Optional[str] = None
+    tags: List[str] = Field(default_factory=list)
+    embeddings: Optional[Dict[str, Any]] = None
+    tagged: bool = False
+    fps: float = Field(default=60.0, gt=0)
+    duration: Optional[float] = Field(default=None, ge=0)
+    latitude: Optional[float] = Field(default=None, ge=-90, le=90)
+    longitude: Optional[float] = Field(default=None, ge=-180, le=180)
+
+class VideoCreate(VideoBase):
+    frames: List[str] = Field(..., min_items=1, description="List of base64 encoded video frames")
+
+class VideoUpdate(BaseModel):
+    description: Optional[str] = None
+    tags: Optional[List[str]] = None
+    embeddings: Optional[Dict[str, Any]] = None
+    tagged: Optional[bool] = None
+    fps: Optional[float] = Field(default=None, gt=0)
+    duration: Optional[float] = Field(default=None, ge=0)
+
+class VideoResponse(VideoBase):
+    id: str  # UUID stored as string
+    frames: List[str]
+    timestamp: datetime
+    
+    class Config:
+        from_attributes = True
