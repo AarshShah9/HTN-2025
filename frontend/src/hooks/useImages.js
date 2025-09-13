@@ -1,50 +1,131 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 
-// Default image data with tags and ISO 8601 timestamps
-const defaultImages = [
-  {
-    id: 1,
-    url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
-    alt: 'Mountain landscape',
-    tags: ['nature', 'mountain', 'landscape', 'outdoor', 'scenic'],
-    timestamp: '2024-12-15T08:30:00.000Z'
+// API base URL - adjust if needed
+const API_BASE_URL = '/api/images';
+
+// API functions for CRUD operations
+const imageAPI = {
+  // Fetch all images
+  async fetchImages(skip = 0, limit = 100, taggedOnly = null) {
+    try {
+      const params = new URLSearchParams({ skip: skip.toString(), limit: limit.toString() });
+      if (taggedOnly !== null) {
+        params.append('tagged_only', taggedOnly.toString());
+      }
+      
+      const response = await fetch(`${API_BASE_URL}?${params}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch images: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching images:', error);
+      throw error;
+    }
   },
-  {
-    id: 2,
-    url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop',
-    alt: 'Forest path',
-    tags: ['nature', 'forest', 'trees', 'path', 'green'],
-    timestamp: '2024-12-14T14:22:00.000Z'
+
+  // Search images by tags
+  async searchByTags(tags, skip = 0, limit = 100) {
+    try {
+      const tagsParam = Array.isArray(tags) ? tags.join(',') : tags;
+      const params = new URLSearchParams({ 
+        tags: tagsParam, 
+        skip: skip.toString(), 
+        limit: limit.toString() 
+      });
+      
+      const response = await fetch(`${API_BASE_URL}/search/by-tags?${params}`);
+      if (!response.ok) {
+        throw new Error(`Failed to search images: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error searching images by tags:', error);
+      throw error;
+    }
   },
-  {
-    id: 3,
-    url: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop',
-    alt: 'Lake reflection',
-    tags: ['nature', 'lake', 'water', 'reflection', 'peaceful'],
-    timestamp: '2024-12-13T17:45:00.000Z'
+
+  // Get image statistics
+  async getStats() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/stats/counts`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch stats: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching image stats:', error);
+      throw error;
+    }
   },
-  {
-    id: 4,
-    url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
-    alt: 'Ocean waves',
-    tags: ['ocean', 'waves', 'beach', 'water', 'blue'],
-    timestamp: '2024-12-12T11:15:00.000Z'
+
+  // Create a new image
+  async createImage(imageData) {
+    try {
+      const response = await fetch(API_BASE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(imageData),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to create image: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error creating image:', error);
+      throw error;
+    }
   },
-  {
-    id: 5,
-    url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=300&fit=crop',
-    alt: 'Desert sunset',
-    tags: ['desert', 'sunset', 'sand', 'warm', 'golden'],
-    timestamp: '2024-12-11T19:30:00.000Z'
+
+  // Update an image
+  async updateImage(imageId, updateData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${imageId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to update image: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating image:', error);
+      throw error;
+    }
   },
-  {
-    id: 6,
-    url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
-    alt: 'City skyline',
-    tags: ['city', 'urban', 'buildings', 'skyline', 'modern'],
-    timestamp: '2024-12-10T09:00:00.000Z'
+
+  // Delete an image
+  async deleteImage(imageId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${imageId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to delete image: ${response.statusText}`);
+      }
+      return true;
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      throw error;
+    }
   }
-];
+};
+
+// Transform backend image data to frontend format
+const transformImageData = (backendImage) => {
+  return {
+    id: backendImage.id,
+    url: backendImage.path, // Assuming path contains the URL or can be used as URL
+    alt: backendImage.description || 'Image',
+    tags: backendImage.tags || [],
+    timestamp: backendImage.timestamp
+  };
+};
 
 // Parse search query to determine search type
 const parseSearchQuery = (query) => {
@@ -85,12 +166,40 @@ const searchImagesByAudio = async (audioDescription) => {
 };
 
 export const useImages = () => {
-  const [images, setImages] = useState(defaultImages);
+  const [images, setImages] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRange, setSelectedRange] = useState(null);
   const [audioFilteredIds, setAudioFilteredIds] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [stats, setStats] = useState({ total_images: 0, tagged_images: 0, untagged_images: 0 });
 
-  // Handle audio search when query changes
+  // Load images from backend on component mount
+  const loadImages = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const backendImages = await imageAPI.fetchImages();
+      const transformedImages = backendImages.map(transformImageData);
+      setImages(transformedImages);
+      
+      // Also load stats
+      const statsData = await imageAPI.getStats();
+      setStats(statsData);
+    } catch (err) {
+      setError(err.message);
+      console.error('Failed to load images:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Load images on mount
+  useEffect(() => {
+    loadImages();
+  }, [loadImages]);
+
+  // Handle search when query changes
   useEffect(() => {
     const searchData = parseSearchQuery(searchQuery);
     
@@ -103,30 +212,59 @@ export const useImages = () => {
     }
   }, [searchQuery]);
 
-  // Filter images based on search query and time range
+  // Search images using backend API for tag-based searches
+  const searchImages = useCallback(async (query) => {
+    if (!query.trim()) {
+      return loadImages(); // Load all images if no query
+    }
+
+    const searchData = parseSearchQuery(query);
+    
+    if (searchData.type === 'tag') {
+      setLoading(true);
+      setError(null);
+      try {
+        const backendImages = await imageAPI.searchByTags(searchData.value);
+        const transformedImages = backendImages.map(transformImageData);
+        setImages(transformedImages);
+      } catch (err) {
+        setError(err.message);
+        console.error('Failed to search images:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  }, [loadImages]);
+
+  // Trigger search when query changes (debounced effect would be better in production)
+  useEffect(() => {
+    const searchData = parseSearchQuery(searchQuery);
+    
+    if (searchData.type === 'tag') {
+      searchImages(searchQuery);
+    } else if (searchData.type === 'audio' && searchData.value) {
+      searchImagesByAudio(searchData.value).then(ids => {
+        setAudioFilteredIds(ids);
+      });
+    } else if (!searchQuery.trim()) {
+      loadImages(); // Reload all images when search is cleared
+    }
+  }, [searchQuery, searchImages, loadImages]);
+
+  // Filter images based on time range and audio search results
   const filteredImages = useMemo(() => {
     let filtered = images;
     const searchData = parseSearchQuery(searchQuery);
 
-    // Filter by search query
-    if (searchQuery.trim()) {
-      if (searchData.type === 'tag') {
-        // Tag-based search (existing functionality)
-        const query = searchData.value.toLowerCase();
+    // For audio search, filter by returned IDs
+    if (searchData.type === 'audio' && searchQuery.trim()) {
+      if (audioFilteredIds.length > 0) {
         filtered = filtered.filter(image => 
-          image.tags.some(tag => tag.toLowerCase().includes(query)) ||
-          image.alt.toLowerCase().includes(query)
+          audioFilteredIds.includes(image.id.toString()) || audioFilteredIds.includes(image.id)
         );
-      } else if (searchData.type === 'audio') {
-        // Audio-based search - filter by IDs returned from API
-        if (audioFilteredIds.length > 0) {
-          filtered = filtered.filter(image => 
-            audioFilteredIds.includes(image.id.toString()) || audioFilteredIds.includes(image.id)
-          );
-        } else {
-          // If no matching IDs, show no results
-          filtered = [];
-        }
+      } else {
+        // If no matching IDs, show no results
+        filtered = [];
       }
     }
 
@@ -144,13 +282,79 @@ export const useImages = () => {
     return filtered;
   }, [images, searchQuery, selectedRange, audioFilteredIds]);
 
+  // CRUD operations for external use
+  const createImage = useCallback(async (imageData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const newImage = await imageAPI.createImage(imageData);
+      const transformedImage = transformImageData(newImage);
+      setImages(prev => [...prev, transformedImage]);
+      
+      // Refresh stats
+      const statsData = await imageAPI.getStats();
+      setStats(statsData);
+      
+      return transformedImage;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const updateImage = useCallback(async (imageId, updateData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const updatedImage = await imageAPI.updateImage(imageId, updateData);
+      const transformedImage = transformImageData(updatedImage);
+      setImages(prev => prev.map(img => img.id === imageId ? transformedImage : img));
+      return transformedImage;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteImage = useCallback(async (imageId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await imageAPI.deleteImage(imageId);
+      setImages(prev => prev.filter(img => img.id !== imageId));
+      
+      // Refresh stats
+      const statsData = await imageAPI.getStats();
+      setStats(statsData);
+      
+      return true;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     images: filteredImages,
     searchQuery,
     setSearchQuery,
     selectedRange,
     setSelectedRange,
-    totalImages: images.length,
-    filteredCount: filteredImages.length
+    totalImages: stats.total_images,
+    filteredCount: filteredImages.length,
+    loading,
+    error,
+    stats,
+    // CRUD operations
+    createImage,
+    updateImage,
+    deleteImage,
+    refreshImages: loadImages
   };
 };
