@@ -84,7 +84,7 @@ async def upload_image(
     )
 
     # Return the created image record as response model
-    return ImageResponse.from_orm(image_record)
+    return ImageResponse.model_validate(image_record)
 
 
 @router.get("/{image_id}", response_model=ImageResponse)
@@ -97,7 +97,7 @@ async def get_image(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Image not found"
         )
-    return ImageResponse.from_orm(image)
+    return ImageResponse.model_validate(image)
 
 
 @router.get("/", response_model=List[ImageResponse])
@@ -115,7 +115,7 @@ async def get_images(
     else:
         images = await repository.get_all_images(skip=skip, limit=limit)
 
-    return [ImageResponse.from_orm(image) for image in images]
+    return [ImageResponse.model_validate(image) for image in images]
 
 
 @router.get("/search/by-tags", response_model=List[ImageResponse])
@@ -134,7 +134,7 @@ async def search_images_by_tags(
         )
 
     images = await repository.search_images_by_tags(tag_list, skip=skip, limit=limit)
-    return [ImageResponse.from_orm(image) for image in images]
+    return [ImageResponse.model_validate(image) for image in images]
 
 
 @router.get("/images_by_audio")
@@ -185,7 +185,7 @@ async def update_image(
             status_code=status.HTTP_404_NOT_FOUND, detail="Image not found"
         )
 
-    return ImageResponse.from_orm(updated_image)
+    return ImageResponse.model_validate(updated_image)
 
 
 @router.delete("/{image_id}", status_code=status.HTTP_204_NO_CONTENT)
