@@ -10,9 +10,7 @@ This module handles image upload functionality, including:
 import base64
 import os
 import uuid
-from typing import List, Optional, Any
-
-from pydantic import BaseModel
+from typing import List, Optional
 
 from database.database import get_db_session
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -56,7 +54,6 @@ def get_audio_repository(
     return AudioRepository(session)
 
 
-
 @router.post("/")
 async def upload_image(
     data: ImageInput,
@@ -66,35 +63,35 @@ async def upload_image(
     """Upload an image from base64 encoded data.
 
     This endpoint accepts base64 encoded image data, saves it to the file system,
-    and creates a corresponding database record. The image is initially untagged
-    and can be processed later by AI services.
+    and creates corresponding database records (one per frame). The image(s) are
+    initially untagged and can be processed later by AI services.
 
     Args:
-        frames: Base64 encoded image data as string
-        audio: Base64 encoded WAV audio to be transcribed and stored separately
-        latitude: Optional GPS latitude coordinate
-        longitude: Optional GPS longitude coordinate
-        repository: Image repository for database operations
-        audio_repository: Audio repository for database operations
+        data: ImageInput model containing:
+            - frames: List[str] of base64-encoded image data
+            - audio: Base64 encoded WAV audio to be transcribed and stored separately
+            - latitude: Optional GPS latitude coordinate
+            - longitude: Optional GPS longitude coordinate
+        repository: Image repository for database operations.
+        audio_repository: Audio repository for database operations.
 
     Returns:
-        ImageResponse: Created image record with metadata
+        ImageResponse: Created image record with metadata.
 
     Raises:
-        HTTPException: If file saving or database operation fails
+        HTTPException: If file saving, audio processing, or database operations fail.
     """
-    # Process audio transcription - audio is required
+
     if not data.audio or data.audio.strip() == "":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Audio data is required"
         )
 
     try:
-        # Decode base64 audio to bytes
         audio_bytes = base64.b64decode(data.audio)
-        # Transcribe audio using the transcription utility
+
         transcription = transcribe_audio_from_bytes(audio_bytes, "audio.wav")
-        # Create audio record in database
+
         audio_record = await audio_repository.create_audio(transcription=transcription)
         audio_id = str(audio_record.id)
     except Exception as e:
@@ -108,16 +105,13 @@ async def upload_image(
             status_code=status.HTTP_400_BAD_REQUEST, detail="No image data provided"
         )
 
-    # Generate unique ID for the image
     image_record = None
     for image in data.frames:
         image_id = str(uuid.uuid4())
 
-        # Define filename and filepath for storage
         filename = f"{image_id}.b64"
         filepath = os.path.join("images", filename)
 
-        # Ensure images directory exists
         os.makedirs("images", exist_ok=True)
 
         # Save base64 data to file system
@@ -126,7 +120,7 @@ async def upload_image(
 
         # Create image record in database with initial metadata
         image_record = await repository.create_image(
-            path=filename,  # Store relative path to the file
+            path=filename,
             description=None,  # No description initially
             tags=[],  # Empty tags initially
             embeddings=None,  # No embeddings initially
@@ -136,7 +130,6 @@ async def upload_image(
             longitude=data.longitude,
         )
 
-    # Return the created image record as response model
     if image_record is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -146,7 +139,7 @@ async def upload_image(
 
 
 @router.get("/{image_id}", response_model=ImageResponse)
-async def get_image(
+async def get_image_by_id(
     image_id: str, repository: ImageRepository = Depends(get_image_repository)
 ):
     """Get an image by ID."""
@@ -176,53 +169,33 @@ async def get_images(
     return [ImageResponse.model_validate(image) for image in images]
 
 
-@router.get("/search/by-tags", response_model=List[ImageResponse])
-async def search_images_by_tags(
-    tags: str,  # Comma-separated tags
-    skip: int = 0,
-    limit: int = 100,
-    repository: ImageRepository = Depends(get_image_repository),
+@router.get("/images_by_transcript")
+async def get_images_by_transcript(
+    transcript: str, limit: int = 2, db: AsyncSession = Depends(get_db_session)
 ):
-    """Search images by tags."""
-    tag_list = [tag.strip() for tag in tags.split(",") if tag.strip()]
-    if not tag_list:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="At least one tag must be provided",
-        )
-
-    images = await repository.search_images_by_tags(tag_list, skip=skip, limit=limit)
-    return [ImageResponse.model_validate(image) for image in images]
-
-
-@router.get("/images_by_embedding")
-async def get_images_by_embedding(
-    audio_description: str, limit: int = 2, db: AsyncSession = Depends(get_db_session)
-):
-    """Search for images based on audio description using semantic similarity.
+    """Search for images based on transcription using semantic similarity.
 
     This endpoint takes a text description (typically from an audio transcription)
     and finds images whose associated audio transcriptions are semantically
     similar to the input text using vector embeddings.
 
     Args:
-        audio_description: Text description derived from audio transcription
+        transcript: Text description derived from audio transcription
         limit: Maximum number of results to return (default: 2)
 
     Returns:
-        List[schemas.Image]: List of images with audio transcriptions most similar
-                             to the input description, ordered by similarity
+        List[schemas.Image]: List of images with audio transcriptions most similar to the input description, ordered by similarity
 
     Example:
         GET /api/images_by_audio?audio_description=a%20dog%20barking%20loudly
     """
-    if not audio_description.strip():
-        raise HTTPException(status_code=400, detail="Audio description cannot be empty")
+    if not transcript.strip():
+        raise HTTPException(status_code=400, detail="Audio transcript cannot be empty")
 
     # Get images with similar audio embeddings
     repo = ImageRepository(db)
     images = await repo.get_images_by_audio(
-        audio_description=audio_description,
+        audio_description=transcript,
         limit=min(limit, 10),  # Cap limit at 10 for performance
     )
 
