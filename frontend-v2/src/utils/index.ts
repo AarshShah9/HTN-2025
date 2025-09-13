@@ -1,1 +1,1 @@
-export { fetchRecording, type AudioData } from './fetchRecording';
+// Audio functionality removed - now using transcript instead

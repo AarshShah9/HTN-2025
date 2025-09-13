@@ -4,15 +4,40 @@ import { MemoryError, MemoryGrid, MemoryLoading, MemorySearch, MemoryStats } fro
 
 const MemoryGallery: React.FC = () => {
   const { memories, loading, error, refetch } = useMemories();
-  const { searchTerm, setSearchTerm, filteredMemories, totalCount, filteredCount } = useMemorySearch(memories);
+  const {
+    searchTerm,
+    setSearchTerm,
+    selectedTags,
+    setSelectedTags,
+    sortOrder,
+    setSortOrder,
+    filteredMemories,
+    totalCount,
+    filteredCount,
+    totalTags,
+    totalLocations,
+    availableTags
+  } = useMemorySearch(memories);
 
   const handleSearchChange = (term: string) => {
     setSearchTerm(term);
   };
 
+  const handleTagToggle = (tag: string) => {
+    setSelectedTags(
+      selectedTags.includes(tag)
+        ? selectedTags.filter(t => t !== tag)
+        : [...selectedTags, tag]
+    );
+  };
+
+  const handleSortChange = (order: 'asc' | 'desc') => {
+    setSortOrder(order);
+  };
+
   const getEmptyMessage = () => {
-    if (searchTerm.trim()) {
-      return `No memories found matching "${searchTerm}".`;
+    if (searchTerm.trim() || selectedTags.length > 0) {
+      return `No memories found matching your filters.`;
     }
     return "No memories found.";
   };
@@ -41,11 +66,18 @@ const MemoryGallery: React.FC = () => {
             <MemorySearch
               searchTerm={searchTerm}
               onSearchChange={handleSearchChange}
+              selectedTags={selectedTags}
+              onTagToggle={handleTagToggle}
+              sortOrder={sortOrder}
+              onSortChange={handleSortChange}
+              availableTags={availableTags}
             />
 
             <MemoryStats
               totalCount={totalCount}
               filteredCount={filteredCount}
+              totalTags={totalTags}
+              totalLocations={totalLocations}
               searchTerm={searchTerm}
             />
 
