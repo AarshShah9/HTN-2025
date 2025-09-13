@@ -56,7 +56,8 @@ class VideoBase(BaseModel):
 class VideoCreate(VideoBase):
     frames: List[str] = Field(
         ..., min_length=1, description="List of base64 encoded video frames"
-    )
+    ),
+    audio: str
 
 
 class VideoUpdate(BaseModel):
