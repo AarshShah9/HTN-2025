@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel, Field
+
 
 class ImageBase(BaseModel):
     description: Optional[str] = None
@@ -8,8 +10,10 @@ class ImageBase(BaseModel):
     embeddings: Optional[Dict[str, Any]] = None
     tagged: bool = False
 
+
 class ImageCreate(ImageBase):
     path: str
+
 
 class ImageUpdate(BaseModel):
     description: Optional[str] = None
@@ -17,11 +21,12 @@ class ImageUpdate(BaseModel):
     embeddings: Optional[Dict[str, Any]] = None
     tagged: Optional[bool] = None
 
+
 class ImageResponse(ImageBase):
     id: str  # UUID stored as string
     path: str
     timestamp: datetime
-    
+
     class Config:
         from_attributes = True
 
@@ -36,8 +41,12 @@ class VideoBase(BaseModel):
     latitude: Optional[float] = Field(default=None, ge=-90, le=90)
     longitude: Optional[float] = Field(default=None, ge=-180, le=180)
 
+
 class VideoCreate(VideoBase):
-    frames: List[str] = Field(..., min_items=1, description="List of base64 encoded video frames")
+    frames: List[str] = Field(
+        ..., min_length=1, description="List of base64 encoded video frames"
+    )
+
 
 class VideoUpdate(BaseModel):
     description: Optional[str] = None
@@ -47,10 +56,11 @@ class VideoUpdate(BaseModel):
     fps: Optional[float] = Field(default=None, gt=0)
     duration: Optional[float] = Field(default=None, ge=0)
 
+
 class VideoResponse(VideoBase):
     id: str  # UUID stored as string
     frames: List[str]
     timestamp: datetime
-    
+
     class Config:
         from_attributes = True
