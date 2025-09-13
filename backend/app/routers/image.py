@@ -51,3 +51,12 @@ async def upload_image(file: UploadFile = File(...), description: str = ""):
         return Image(**image_data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/images_by_audio")
+def get_images_by_audio(audio_description: str):
+    """
+    Search for images based on audio description.
+    This endpoint matches the audio description against image descriptions and tags.
+    """
+    ...

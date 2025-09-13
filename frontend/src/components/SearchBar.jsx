@@ -6,7 +6,7 @@ const SearchBar = ({ searchQuery, setSearchQuery, filteredCount, totalImages }) 
       <div className="search-bar">
         <input
           type="text"
-          placeholder="Search images by tags (e.g., nature, mountain, city)..."
+          placeholder="Search by tags: nature, mountain OR audio: describe what you heard..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-input"

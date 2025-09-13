@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 // Default image data with tags and ISO 8601 timestamps
 const defaultImages = [
@@ -46,22 +46,88 @@ const defaultImages = [
   }
 ];
 
+// Parse search query to determine search type
+const parseSearchQuery = (query) => {
+  const trimmedQuery = query.trim();
+  
+  if (trimmedQuery.startsWith('tag:')) {
+    return {
+      type: 'tag',
+      value: trimmedQuery.substring(4).trim()
+    };
+  } else if (trimmedQuery.startsWith('audio:')) {
+    return {
+      type: 'audio',
+      value: trimmedQuery.substring(6).trim()
+    };
+  } else {
+    // Default to tag search for backward compatibility
+    return {
+      type: 'tag',
+      value: trimmedQuery
+    };
+  }
+};
+
+// API call for audio-based search
+const searchImagesByAudio = async (audioDescription) => {
+  try {
+    const response = await fetch(`/api/image/images_by_audio?audio_description=${encodeURIComponent(audioDescription)}`);
+    if (!response.ok) {
+      throw new Error('Failed to search images by audio');
+    }
+    const data = await response.json();
+    return data.image_ids || [];
+  } catch (error) {
+    console.error('Error searching images by audio:', error);
+    return [];
+  }
+};
+
 export const useImages = () => {
-  const [images] = useState(defaultImages);
+  const [images, setImages] = useState(defaultImages);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRange, setSelectedRange] = useState(null);
+  const [audioFilteredIds, setAudioFilteredIds] = useState([]);
+
+  // Handle audio search when query changes
+  useEffect(() => {
+    const searchData = parseSearchQuery(searchQuery);
+    
+    if (searchData.type === 'audio' && searchData.value) {
+      searchImagesByAudio(searchData.value).then(ids => {
+        setAudioFilteredIds(ids);
+      });
+    } else {
+      setAudioFilteredIds([]);
+    }
+  }, [searchQuery]);
 
   // Filter images based on search query and time range
   const filteredImages = useMemo(() => {
     let filtered = images;
+    const searchData = parseSearchQuery(searchQuery);
 
     // Filter by search query
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(image => 
-        image.tags.some(tag => tag.toLowerCase().includes(query)) ||
-        image.alt.toLowerCase().includes(query)
-      );
+      if (searchData.type === 'tag') {
+        // Tag-based search (existing functionality)
+        const query = searchData.value.toLowerCase();
+        filtered = filtered.filter(image => 
+          image.tags.some(tag => tag.toLowerCase().includes(query)) ||
+          image.alt.toLowerCase().includes(query)
+        );
+      } else if (searchData.type === 'audio') {
+        // Audio-based search - filter by IDs returned from API
+        if (audioFilteredIds.length > 0) {
+          filtered = filtered.filter(image => 
+            audioFilteredIds.includes(image.id.toString()) || audioFilteredIds.includes(image.id)
+          );
+        } else {
+          // If no matching IDs, show no results
+          filtered = [];
+        }
+      }
     }
 
     // Filter by selected time range
@@ -76,7 +142,7 @@ export const useImages = () => {
     }
 
     return filtered;
-  }, [images, searchQuery, selectedRange]);
+  }, [images, searchQuery, selectedRange, audioFilteredIds]);
 
   return {
     images: filteredImages,
