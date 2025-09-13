@@ -1,0 +1,1 @@
+from .tagging import get_image_tags_batch_as_parts
