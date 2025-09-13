@@ -56,11 +56,10 @@ export const useMemorySearch = (memories: MemoryImage[]): UseMemorySearchResult 
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter((memory) =>
-        memory.transcript.toLowerCase().includes(term) ||
+        memory.description?.toLowerCase().includes(term) ||
         memory.tags.some(tag => tag.toLowerCase().includes(term)) ||
-        (memory.location && memory.location.toLowerCase().includes(term)) ||
-        (memory.people && memory.people.some(person => person.toLowerCase().includes(term)))
-      );
+        (memory.location && memory.location.toLowerCase().includes(term))
+      )
     }
 
     // Apply tag filtering
