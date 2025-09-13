@@ -53,11 +53,11 @@ const MemoryCard: React.FC<MemoryCardProps> = ({ memory }) => {
             className="w-full h-64 object-cover rounded-lg"
           />
 
-          {/* Transcription Section */}
+          {/* Description Section */}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium">Transcription</h3>
+            <h3 className="text-sm font-medium">Description</h3>
             <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-lg">
-              {memory.transcript}
+              {memory?.description}
             </p>
           </div>
 
