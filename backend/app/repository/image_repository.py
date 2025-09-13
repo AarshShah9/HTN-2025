@@ -185,15 +185,15 @@ class ImageRepository:
         update_data = {}
 
         if description is not None:
-            update_data[ImageModel.description] = description
+            update_data["description"] = description
         if tags is not None:
-            update_data[ImageModel.tags] = tags
+            update_data["tags"] = tags
         if embeddings is not None:
-            update_data[ImageModel.embeddings] = embeddings
+            update_data["embeddings"] = embeddings
         if tagged is not None:
-            update_data[ImageModel.tagged] = tagged
+            update_data["tagged"] = tagged
         if audio is not None:
-            update_data[ImageModel.audio] = audio
+            update_data["audio"] = audio
 
         if not update_data:
             return await self.get_image_by_id(image_id)

@@ -9,6 +9,7 @@ This module handles image upload functionality, including:
 
 import os
 import uuid
+from typing import Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession

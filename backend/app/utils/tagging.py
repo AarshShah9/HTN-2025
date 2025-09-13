@@ -9,40 +9,46 @@ This module provides functionality for:
 
 import os
 import json
+import base64
+import io
 from typing import List, Dict, Any
 import google.generativeai as genai
-from PIL import Image
+from PIL import Image, ImageFile
+from dotenv import load_dotenv
+
+# Enable loading of truncated images to prevent PIL errors with API processing
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 def get_image_tags_batch_as_parts(
     image_paths: List[str],
     max_tags: int = 20
 ) -> Dict[str, Any]:
     """Analyze multiple images in batch using Google Gemini API.
-    
+
     This function processes multiple images simultaneously to generate:
     - Descriptive tags for each image
     - Object detection with locations
     - Scene type classification (indoor/outdoor/urban/nature)
     - Dominant color analysis
     - Natural language descriptions
-    
+
     The function uses prompt engineering to ensure consistent JSON output
     format for reliable data processing.
     
     Args:
-        image_paths: List of file paths to images for analysis
-        max_tags: Maximum number of descriptive tags per image (default: 20)
+        image_paths: List of relative paths to base64 image files in /images folder
+        max_tags: Maximum number of tags to extract per image
     
     Returns:
         Dict containing:
         - batch_results: List of analysis results for each image
         - image_paths: List of successfully processed image paths
         - error: Error message if processing failed
-        
+
     Raises:
         ValueError: If GOOGLE_API_KEY environment variable is not set
         Exception: If API call or image processing fails
-        
+
     Example:
         >>> result = get_image_tags_batch_as_parts(["img1.jpg", "img2.jpg"])
         >>> if "error" not in result:
@@ -50,6 +56,7 @@ def get_image_tags_batch_as_parts(
         ...         print(f"Tags: {analysis['tags']}")
         ...         print(f"Description: {analysis['description']}")
     """
+    load_dotenv()
     # Configure the Gemini API
     api_key = os.environ.get("GOOGLE_API_KEY")
     if not api_key:
@@ -96,10 +103,34 @@ def get_image_tags_batch_as_parts(
     """
     parts.append(text_prompt)
     
-    # Add each image as a part
+    # Add each image as a part by reading base64 files
     for _, img_path in enumerate(image_paths):
         try:
-            img = Image.open(img_path)
+            # Construct full path to the base64 file in images directory
+            full_path = os.path.join("images", img_path)
+
+            # Read the base64 content from the file
+            with open(full_path, 'r') as f:
+                base64_content = f.read().strip()
+
+            # Handle data URL format (data:image/jpeg;base64,<data>)
+            if base64_content.startswith('data:'):
+                # Extract just the base64 data part after the comma
+                base64_data = base64_content.split(',', 1)[1]
+            else:
+                # Assume it's raw base64 data
+                base64_data = base64_content
+
+            # Decode base64 to bytes
+            image_bytes = base64.b64decode(base64_data)
+
+            # Convert bytes to PIL Image
+            img = Image.open(io.BytesIO(image_bytes))
+            
+            # Ensure image is in RGB mode for consistency with Gemini API
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+
             parts.append(img)
             valid_images.append(img_path)
         except Exception as e:
