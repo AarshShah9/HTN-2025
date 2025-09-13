@@ -7,7 +7,8 @@ import { MemoryError, MemoryLoading } from './index';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
 import { Badge } from './ui/badge';
-import { Calendar, MapPin } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import type { MemoryImage } from '@/lib/types';
 
 // Fix for default markers in react-leaflet
 delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
@@ -46,9 +47,9 @@ const createClusterIcon = (imageUrl: string, count: number) => {
       </div>
     `,
     className: 'custom-memory-marker',
-    iconSize: [40, 40],
+    iconSize: [60, 60],
     iconAnchor: [20, 20],
-    popupAnchor: [0, -20],
+    popupAnchor: [0, -30],
   });
 };
 
@@ -84,6 +85,7 @@ const groupMemoriesByLocation = (memories: MemoryImage[]): LocationGroup[] => {
 const MapPage: React.FC = () => {
   const { memories, loading, error, refetch } = useMemories();
   const [_, setSelectedMemory] = useState<string | null>(null);
+  const [currentMemoryIndex, setCurrentMemoryIndex] = useState<{ [key: string]: number }>({});
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
   useEffect(() => {
@@ -101,6 +103,11 @@ const MapPage: React.FC = () => {
       !isNaN(memory.longitude)
     );
   }, [memories]);
+
+  // Group memories by location
+  const locationGroups = useMemo(() => {
+    return groupMemoriesByLocation(memoriesWithLocation);
+  }, [memoriesWithLocation]);
 
   // Calculate map center based on all memories
   const mapCenter = useMemo(() => {
@@ -131,6 +138,29 @@ const MapPage: React.FC = () => {
     if (maxRange > 1) return 10;
     if (maxRange > 0.5) return 11;
     return 12;
+  };
+
+  // Get current memory for a location group
+  const getCurrentMemory = (locationKey: string, memories: MemoryImage[]) => {
+    const index = currentMemoryIndex[locationKey] || 0;
+    return memories[index];
+  };
+
+  // Navigate to next/previous memory in a cluster
+  const navigateMemory = (locationKey: string, memories: MemoryImage[], direction: 'next' | 'prev') => {
+    const currentIndex = currentMemoryIndex[locationKey] || 0;
+    let newIndex;
+    
+    if (direction === 'next') {
+      newIndex = (currentIndex + 1) % memories.length;
+    } else {
+      newIndex = currentIndex === 0 ? memories.length - 1 : currentIndex - 1;
+    }
+    
+    setCurrentMemoryIndex(prev => ({
+      ...prev,
+      [locationKey]: newIndex
+    }));
   };
 
   if (loading) {
@@ -181,20 +211,63 @@ const MapPage: React.FC = () => {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               
-              {memoriesWithLocation.map((memory) => (
-                <Marker
-                  key={memory.id}
-                  position={[memory.latitude!, memory.longitude!]}
-                  icon={createMemoryIcon(memory.imageUrl)}
-                  eventHandlers={{
-                    click: () => setSelectedMemory(memory.id),
-                  }}
-                >
-                  <Popup className="custom-popup" minWidth={250}>
+              {locationGroups.map((locationGroup) => {
+                const locationKey = `${locationGroup.lat.toFixed(6)},${locationGroup.lng.toFixed(6)}`;
+                const currentMemory = getCurrentMemory(locationKey, locationGroup.memories);
+                const isCluster = locationGroup.memories.length > 1;
+                
+                return (
+                  <Marker
+                    key={locationKey}
+                    position={[locationGroup.lat, locationGroup.lng]}
+                    icon={isCluster 
+                      ? createClusterIcon(currentMemory.imageUrl, locationGroup.memories.length)
+                      : createMemoryIcon(currentMemory.imageUrl)
+                    }
+                    eventHandlers={{
+                      click: () => setSelectedMemory(currentMemory.id),
+                    }}
+                  >
+                    <Popup className="custom-popup" minWidth={250}>
                     <div className="p-2">
+                      {/* Cluster navigation header */}
+                      {isCluster && (
+                        <div className="flex items-center justify-between mb-3 pb-2 border-b">
+                          <div className="text-sm font-medium">
+                            {(currentMemoryIndex[locationKey] || 0) + 1} of {locationGroup.memories.length} memories
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigateMemory(locationKey, locationGroup.memories, 'prev');
+                              }}
+                              disabled={locationGroup.memories.length <= 1}
+                              className="h-6 w-6 p-0"
+                            >
+                              <ChevronLeft className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigateMemory(locationKey, locationGroup.memories, 'next');
+                              }}
+                              disabled={locationGroup.memories.length <= 1}
+                              className="h-6 w-6 p-0"
+                            >
+                              <ChevronRight className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
                       <div className="aspect-video mb-3 rounded overflow-hidden">
                         <img 
-                          src={memory.imageUrl} 
+                          src={currentMemory.imageUrl} 
                           alt="Memory"
                           className="w-full h-full object-cover"
                         />
@@ -203,42 +276,35 @@ const MapPage: React.FC = () => {
                       <div className="space-y-2">
                         <div className="flex items-center text-sm text-muted-foreground">
                           <Calendar className="h-4 w-4 mr-1" />
-                          {new Date(memory.date).toLocaleDateString()}
+                          {new Date(currentMemory.date).toLocaleDateString()}
                         </div>
                         
-                        {memory.location && (
+                        {currentMemory.location && (
                           <div className="flex items-center text-sm text-muted-foreground">
                             <MapPin className="h-4 w-4 mr-1" />
-                            {memory.location}
+                            {currentMemory.location}
                           </div>
                         )}
                         
-                        {/* {memory.people && memory.people.length > 0 && (
-                          <div className="flex items-center text-sm text-muted-foreground">
-                            <Users className="h-4 w-4 mr-1" />
-                            {memory.people.join(', ')}
-                          </div>
-                        )} */}
-                        
-                        {memory.tags && memory.tags.length > 0 && (
+                        {currentMemory.tags && currentMemory.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
-                            {memory.tags.slice(0, 3).map((tag, index) => (
+                            {currentMemory.tags.slice(0, 3).map((tag, index) => (
                               <Badge key={index} variant="secondary" className="text-xs">
                                 {tag}
                               </Badge>
                             ))}
-                            {memory.tags.length > 3 && (
+                            {currentMemory.tags.length > 3 && (
                               <Badge variant="outline" className="text-xs">
-                                +{memory.tags.length - 3} more
+                                +{currentMemory.tags.length - 3} more
                               </Badge>
                             )}
                           </div>
                         )}
                         
-                        {memory.description && (
+                        {currentMemory.description && (
                           <div className="mt-3 pt-3 border-t">
                             <p className="text-sm text-muted-foreground line-clamp-2">
-                              {memory.description}
+                              {currentMemory.description}
                             </p>
                           </div>
                         )}
@@ -253,7 +319,7 @@ const MapPage: React.FC = () => {
                             <div className="space-y-4">
                               <div className="aspect-video rounded overflow-hidden">
                                 <img 
-                                  src={memory.imageUrl} 
+                                  src={currentMemory.imageUrl} 
                                   alt="Memory"
                                   className="w-full h-full object-cover"
                                 />
@@ -263,19 +329,19 @@ const MapPage: React.FC = () => {
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center text-sm text-muted-foreground">
                                     <Calendar className="h-4 w-4 mr-1" />
-                                    {new Date(memory.date).toLocaleDateString()}
+                                    {new Date(currentMemory.date).toLocaleDateString()}
                                   </div>
                                   
-                                  {memory.location && (
+                                  {currentMemory.location && (
                                     <div className="flex items-center text-sm text-muted-foreground">
                                       <MapPin className="h-4 w-4 mr-1" />
-                                      {memory.location}
+                                      {currentMemory.location}
                                     </div>
                                   )}
                                 </div>
-                                {memory.tags && memory.tags.length > 0 && (
+                                {currentMemory.tags && currentMemory.tags.length > 0 && (
                                   <div className="flex flex-wrap gap-1">
-                                    {memory.tags.map((tag, index) => (
+                                    {currentMemory.tags.map((tag, index) => (
                                       <Badge key={index} variant="secondary">
                                         {tag}
                                       </Badge>
@@ -283,11 +349,11 @@ const MapPage: React.FC = () => {
                                   </div>
                                 )}
                                 
-                                {memory.description && (
+                                {currentMemory.description && (
                                   <div className="pt-3 border-t">
                                     <h4 className="font-semibold mb-2">Transcript</h4>
                                     <p className="text-sm text-muted-foreground">
-                                      {memory.description}
+                                      {currentMemory.description}
                                     </p>
                                   </div>
                                 )}
@@ -299,7 +365,8 @@ const MapPage: React.FC = () => {
                     </div>
                   </Popup>
                 </Marker>
-              ))}
+                );
+              })}
             </MapContainer>
           </div>
         </div>
@@ -317,7 +384,20 @@ const MapPage: React.FC = () => {
           transition: transform 0.2s ease;
         }
         
-        .memory-marker:hover {
+        .memory-cluster-marker {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          border: 3px solid white;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          overflow: hidden;
+          cursor: pointer;
+          transition: transform 0.2s ease;
+          position: relative;
+        }
+        
+        .memory-marker:hover,
+        .memory-cluster-marker:hover {
           transform: scale(1.1);
         }
         
@@ -332,6 +412,24 @@ const MapPage: React.FC = () => {
           width: 100%;
           height: 100%;
           object-fit: cover;
+        }
+        
+        .memory-count-badge {
+          position: absolute;
+          top: 5px;
+          right: 5px;
+          background: #ef4444;
+          color: white;
+          border-radius: 50%;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: bold;
+          border: 2px solid white;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.3);
         }
         
         .custom-memory-marker {
