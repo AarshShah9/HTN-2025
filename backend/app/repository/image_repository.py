@@ -16,7 +16,9 @@ class ImageRepository:
         description: Optional[str] = None,
         tags: Optional[List[str]] = None,
         embeddings: Optional[dict] = None,
-        tagged: bool = False
+        tagged: bool = False,
+        latitude: Optional[float] = None,
+        longitude: Optional[float] = None
     ) -> ImageModel:
         """Create a new image record."""
         if tags is None:
@@ -28,7 +30,9 @@ class ImageRepository:
             tags=tags,
             embeddings=embeddings,
             tagged=tagged,
-            timestamp=datetime.utcnow()
+            timestamp=datetime.utcnow(),
+            latitude=latitude,
+            longitude=longitude
         )
         
         self.session.add(image)
@@ -165,3 +169,12 @@ class ImageRepository:
             select(ImageModel.id).where(ImageModel.tagged == False)
         )
         return len(result.scalars().all())
+    
+    async def get_image_locations(self) -> List[Tuple[float, float]]:
+        """Get all image locations."""
+        result = await self.session.execute(
+            select(ImageModel.latitude, ImageModel.longitude)
+            .where(ImageModel.latitude.is_not_none())
+            .where(ImageModel.longitude.is_not_none())
+        )
+        return result.scalars().all()

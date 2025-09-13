@@ -131,6 +131,17 @@ async def get_image_stats(
         "tagged_images": tagged,
         "untagged_images": untagged
     }
+    
+@router.get("/stats/locations")
+async def get_image_locations(
+    repository: ImageRepository = Depends(get_image_repository)
+):
+    """
+    Get image locations.
+    """
+    locations = await repository.get_image_locations()
+    return locations
+    
 
 @router.get("/images_by_audio")
 def get_images_by_audio(audio_description: str):
