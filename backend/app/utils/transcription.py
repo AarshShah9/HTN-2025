@@ -82,6 +82,26 @@ def transcribe_audio_with_gemini(audio_file_path: str) -> Optional[str]:
         return None
 
 
+def save_audio_from_base64(audio_b64: str, sample_rate: int = 44100, filename: str = "audio.wav"):
+    audio_bytes = base64.b64decode(audio_b64)
+    audio_np = np.frombuffer(audio_bytes, dtype=np.int16)
+    with wave.open(filename, 'wb') as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(sample_rate)
+        wf.writeframes(audio_np.tobytes())
+# Save frames
+    for idx, f_b64 in enumerate(frames):
+        frame_path = os.path.join(folder_path, f"frame_{idx:05d}.jpg")
+        with open(frame_path, "wb") as f:
+            f.write(base64.b64decode(f_b64))
+
+
+
+
+
+
+
 def transcribe_audio_from_bytes(audio_bytes: bytes, filename: str = "audio.wav") -> Optional[str]:
     """
     Transcribe audio from bytes using Google Gemini.
@@ -95,17 +115,15 @@ def transcribe_audio_from_bytes(audio_bytes: bytes, filename: str = "audio.wav")
     """
     try:
         # Create a temporary file
-        with tempfile.NamedTemporaryFile(suffix=Path(filename).suffix, delete=False) as temp_file:
-            temp_file.write(audio_bytes)
-            temp_file_path = temp_file.name
+        save_audio_from_base64(audio_bytes, filename=filename)
         
         try:
             # Transcribe the temporary file
-            result = transcribe_audio_with_gemini(temp_file_path)
+            result = transcribe_audio_with_gemini(filename)
             return result
         finally:
             # Clean up the temporary file
-            Path(temp_file_path).unlink(missing_ok=True)
+            Path(filename).unlink(missing_ok=True)
             
     except Exception as e:
         print(f"Error transcribing audio from bytes: {str(e)}")
