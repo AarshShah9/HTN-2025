@@ -26,6 +26,7 @@ async def create_video(
             tagged=video_data.tagged,
             fps=video_data.fps,
             duration=video_data.duration,
+            audio=video_data.audio,
             latitude=video_data.latitude,
             longitude=video_data.longitude
         )
@@ -165,7 +166,8 @@ async def update_video(
         embeddings=video_update.embeddings,
         tagged=video_update.tagged,
         fps=video_update.fps,
-        duration=video_update.duration
+        duration=video_update.duration,
+        audio=video_update.audio
     )
     
     if not updated_video:

@@ -47,6 +47,7 @@ class ImageRepository:
         tags: Optional[List[str]] = None,
         embeddings: Optional[dict] = None,
         tagged: bool = False,
+        audio: Optional[str] = None,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
     ) -> ImageModel:
@@ -58,6 +59,7 @@ class ImageRepository:
             tags: List of descriptive tags (defaults to empty list)
             embeddings: Optional vector embeddings for semantic search
             tagged: Whether the image has been processed by AI (default: False)
+            audio: Optional base64 encoded WAV audio at 44100 sample rate
             latitude: Optional GPS latitude coordinate
             longitude: Optional GPS longitude coordinate
 
@@ -77,6 +79,7 @@ class ImageRepository:
             tags=tags,
             embeddings=embeddings,
             tagged=tagged,
+            audio=audio,
             timestamp=datetime.utcnow(),
             latitude=latitude,
             longitude=longitude,
@@ -175,6 +178,7 @@ class ImageRepository:
         tags: Optional[List[str]] = None,
         embeddings: Optional[dict] = None,
         tagged: Optional[bool] = None,
+        audio: Optional[str] = None,
     ) -> Optional[ImageModel]:
         """Update an image record."""
         id_str = str(image_id) if isinstance(image_id, UUID) else image_id
@@ -188,6 +192,8 @@ class ImageRepository:
             update_data[ImageModel.embeddings] = embeddings
         if tagged is not None:
             update_data[ImageModel.tagged] = tagged
+        if audio is not None:
+            update_data[ImageModel.audio] = audio
 
         if not update_data:
             return await self.get_image_by_id(image_id)

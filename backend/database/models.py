@@ -31,6 +31,7 @@ class ImageModel(Base):
         description (str): AI-generated natural language description
         path (str): Relative file path to the image file
         tags (list): List of AI-generated descriptive tags
+        audio (str): Base64 encoded WAV audio at 44100 sample rate (optional)
         latitude (float): GPS latitude coordinate (optional)
         longitude (float): GPS longitude coordinate (optional)
     """
@@ -57,6 +58,9 @@ class ImageModel(Base):
 
     # File system reference
     path = Column(String(500), nullable=False)  # Relative path to image file
+
+    # Audio data (optional)
+    audio = Column(Text, nullable=True)  # Base64 encoded WAV audio at 44100 sample rate
 
     # Location data (optional)
     latitude = Column(Float, nullable=True)  # GPS coordinates
@@ -110,6 +114,7 @@ class VideoModel(Base):
         description (str): AI-generated natural language description
         frames (list): List of base64 encoded video frames at 60fps
         tags (list): List of AI-generated descriptive tags
+        audio (str): Base64 encoded WAV audio at 44100 sample rate (optional)
         latitude (float): GPS latitude coordinate (optional)
         longitude (float): GPS longitude coordinate (optional)
         fps (int): Frames per second (default: 60)
@@ -140,6 +145,9 @@ class VideoModel(Base):
     frames = Column(JSON, nullable=False)  # List of base64 encoded frames
     fps = Column(Float, default=60.0, nullable=False)  # Frames per second
     duration = Column(Float, nullable=True)  # Duration in seconds
+
+    # Audio data (optional)
+    audio = Column(Text, nullable=True)  # Base64 encoded WAV audio at 44100 sample rate
 
     # Location data (optional)
     latitude = Column(Float, nullable=True)  # GPS coordinates

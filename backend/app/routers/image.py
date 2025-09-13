@@ -34,7 +34,8 @@ def get_image_repository(session: AsyncSession = Depends(get_db_session)) -> Ima
 
 @router.post("/upload", response_model=ImageResponse)
 async def upload_image(
-    base64_data: str, 
+    base64_data: str,
+    audio: Optional[str] = None,
     repository: ImageRepository = Depends(get_image_repository)
 ):
     """Upload an image from base64 encoded data.
@@ -45,6 +46,7 @@ async def upload_image(
     
     Args:
         base64_data: Base64 encoded image data as string
+        audio: Optional base64 encoded WAV audio at 44100 sample rate
         repository: Image repository for database operations
         
     Returns:
@@ -73,7 +75,8 @@ async def upload_image(
         description=None,     # No description initially
         tags=[],             # Empty tags initially
         embeddings=None,     # No embeddings initially
-        tagged=False         # Not processed by AI yet
+        tagged=False,        # Not processed by AI yet
+        audio=audio          # Optional base64 encoded WAV audio
     )
     
     # Return the created image record as response model

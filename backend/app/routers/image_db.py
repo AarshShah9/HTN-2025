@@ -11,27 +11,6 @@ router = APIRouter(prefix="/api/images", tags=["images"])
 def get_image_repository(session: AsyncSession = Depends(get_db_session)) -> ImageRepository:
     return ImageRepository(session)
 
-@router.post("/", response_model=ImageResponse, status_code=status.HTTP_201_CREATED)
-async def create_image(
-    image_data: ImageCreate,
-    repository: ImageRepository = Depends(get_image_repository)
-):
-    """Create a new image record."""
-    try:
-        image = await repository.create_image(
-            path=image_data.path,
-            description=image_data.description,
-            tags=image_data.tags,
-            embeddings=image_data.embeddings,
-            tagged=image_data.tagged
-        )
-        return ImageResponse.from_orm(image)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to create image: {str(e)}"
-        )
-
 @router.get("/{image_id}", response_model=ImageResponse)
 async def get_image(
     image_id: str,

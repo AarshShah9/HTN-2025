@@ -49,6 +49,7 @@ class VideoRepository:
         tagged: bool = False,
         fps: float = 60.0,
         duration: Optional[float] = None,
+        audio: Optional[str] = None,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
     ) -> VideoModel:
@@ -62,6 +63,7 @@ class VideoRepository:
             tagged: Whether the video has been processed by AI (default: False)
             fps: Frames per second (default: 60.0)
             duration: Optional video duration in seconds
+            audio: Optional base64 encoded WAV audio at 44100 sample rate
             latitude: Optional GPS latitude coordinate
             longitude: Optional GPS longitude coordinate
 
@@ -87,6 +89,7 @@ class VideoRepository:
             tagged=tagged,
             fps=fps,
             duration=duration,
+            audio=audio,
             timestamp=datetime.utcnow(),
             latitude=latitude,
             longitude=longitude,
@@ -178,6 +181,7 @@ class VideoRepository:
         tagged: Optional[bool] = None,
         fps: Optional[float] = None,
         duration: Optional[float] = None,
+        audio: Optional[str] = None,
     ) -> Optional[VideoModel]:
         """Update a video record."""
         id_str = str(video_id) if isinstance(video_id, UUID) else video_id
@@ -195,6 +199,8 @@ class VideoRepository:
             update_data[VideoModel.fps] = fps
         if duration is not None:
             update_data[VideoModel.duration] = duration
+        if audio is not None:
+            update_data[VideoModel.audio] = audio
 
         if not update_data:
             return await self.get_video_by_id(video_id)
