@@ -1,3 +1,12 @@
+"""AI-powered image tagging and analysis using Google Gemini.
+
+This module provides functionality for:
+- Batch image analysis using Google Gemini API
+- Automatic tag generation and object detection
+- Scene classification and color analysis
+- Structured JSON output for consistent data processing
+"""
+
 import os
 import json
 from typing import List, Dict, Any
@@ -8,16 +17,38 @@ def get_image_tags_batch_as_parts(
     image_paths: List[str],
     max_tags: int = 20
 ) -> Dict[str, Any]:
-    """
-    Implementation that sends all images at once as a multipart prompt,
-    forcing JSON format output through prompt engineering.
+    """Analyze multiple images in batch using Google Gemini API.
+    
+    This function processes multiple images simultaneously to generate:
+    - Descriptive tags for each image
+    - Object detection with locations
+    - Scene type classification (indoor/outdoor/urban/nature)
+    - Dominant color analysis
+    - Natural language descriptions
+    
+    The function uses prompt engineering to ensure consistent JSON output
+    format for reliable data processing.
     
     Args:
-        image_paths: List of paths to image files
-        max_tags: Maximum number of tags to extract per image
+        image_paths: List of file paths to images for analysis
+        max_tags: Maximum number of descriptive tags per image (default: 20)
     
     Returns:
-        Dictionary with results for batch analysis
+        Dict containing:
+        - batch_results: List of analysis results for each image
+        - image_paths: List of successfully processed image paths
+        - error: Error message if processing failed
+        
+    Raises:
+        ValueError: If GOOGLE_API_KEY environment variable is not set
+        Exception: If API call or image processing fails
+        
+    Example:
+        >>> result = get_image_tags_batch_as_parts(["img1.jpg", "img2.jpg"])
+        >>> if "error" not in result:
+        ...     for analysis in result["batch_results"]:
+        ...         print(f"Tags: {analysis['tags']}")
+        ...         print(f"Description: {analysis['description']}")
     """
     # Configure the Gemini API
     api_key = os.environ.get("GOOGLE_API_KEY")

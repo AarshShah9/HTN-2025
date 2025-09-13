@@ -1,3 +1,13 @@
+"""Repository layer for image data access operations.
+
+This module provides a clean abstraction layer between the API routes
+and the database, implementing the Repository pattern for:
+- CRUD operations on image records
+- Complex queries and filtering
+- Database transaction management
+- Data validation and error handling
+"""
+
 import sys 
 sys.path.append("../..")
 from typing import List, Optional, Union
@@ -9,7 +19,22 @@ from database.models import ImageModel
 from datetime import datetime
 
 class ImageRepository:
+    """Repository class for image database operations.
+    
+    This class encapsulates all database operations related to images,
+    providing a clean interface for the service layer while handling
+    database-specific concerns like transactions and error handling.
+    
+    Attributes:
+        session: Async SQLAlchemy session for database operations
+    """
+    
     def __init__(self, session: AsyncSession):
+        """Initialize the repository with a database session.
+        
+        Args:
+            session: Async SQLAlchemy session for database operations
+        """
         self.session = session
     
     async def create_image(
@@ -22,10 +47,27 @@ class ImageRepository:
         latitude: Optional[float] = None,
         longitude: Optional[float] = None
     ) -> ImageModel:
-        """Create a new image record."""
+        """Create a new image record in the database.
+        
+        Args:
+            path: File path to the image (relative to images directory)
+            description: Optional natural language description
+            tags: List of descriptive tags (defaults to empty list)
+            embeddings: Optional vector embeddings for semantic search
+            tagged: Whether the image has been processed by AI (default: False)
+            latitude: Optional GPS latitude coordinate
+            longitude: Optional GPS longitude coordinate
+            
+        Returns:
+            ImageModel: The created image record with generated ID and timestamp
+            
+        Raises:
+            SQLAlchemyError: If database operation fails
+        """
         if tags is None:
             tags = []
         
+        # Create new image model instance
         image = ImageModel(
             path=path,
             description=description,
@@ -37,13 +79,21 @@ class ImageRepository:
             longitude=longitude
         )
         
+        # Add to session and commit to database
         self.session.add(image)
         await self.session.commit()
-        await self.session.refresh(image)
+        await self.session.refresh(image)  # Refresh to get generated fields
         return image
     
     async def get_image_by_id(self, image_id: Union[UUID, str]) -> Optional[ImageModel]:
-        """Get an image by its ID."""
+        """Retrieve an image record by its unique identifier.
+        
+        Args:
+            image_id: UUID or string representation of the image ID
+            
+        Returns:
+            ImageModel: The image record if found, None otherwise
+        """
         id_str = str(image_id) if isinstance(image_id, UUID) else image_id
         result = await self.session.execute(
             select(ImageModel).where(ImageModel.id == id_str)

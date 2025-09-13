@@ -1,3 +1,13 @@
+"""Main FastAPI application entry point.
+
+This module sets up the FastAPI application with:
+- Database initialization
+- CORS middleware for frontend communication
+- Static file serving for images
+- Background worker tasks
+- API route registration
+"""
+
 import asyncio
 from contextlib import asynccontextmanager
 import os
@@ -12,6 +22,19 @@ from fastapi.staticfiles import StaticFiles
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Application lifespan manager.
+    
+    Handles startup and shutdown operations:
+    - Database initialization on startup
+    - Background worker management
+    - Cleanup on shutdown
+    
+    Args:
+        app: FastAPI application instance
+        
+    Yields:
+        None: Control to FastAPI during application runtime
+    """
     # Initialize database
     await init_db()
     print("Database initialized")
@@ -21,7 +44,11 @@ async def lifespan(app: FastAPI):
 
     # Start the background worker
     async def print_worker():
-        """Worker that prints a message every 15 seconds."""
+        """Background worker that prints a status message every 15 seconds.
+        
+        This is a demonstration worker that can be replaced with actual
+        background processing tasks like image analysis, cleanup, etc.
+        """
         while True:
             print("Worker running - 15 second interval")
             await asyncio.sleep(15)
@@ -39,7 +66,13 @@ async def lifespan(app: FastAPI):
     print("Background worker stopped")
 
 
-app = FastAPI(title="HTN 2025", version="1.0.0", lifespan=lifespan)
+# Create FastAPI application instance with metadata
+app = FastAPI(
+    title="HTN 2025 - AI-Powered Memory Gallery",
+    description="A sophisticated image management system with AI-powered tagging and search",
+    version="1.0.0",
+    lifespan=lifespan
+)
 
 # Add CORS middleware to allow frontend connections
 app.add_middleware(
@@ -62,10 +95,27 @@ app.include_router(image_db_router)
 
 @app.get("/")
 def read_root():
-    return {"message": "HTN 2025"}
+    """Root endpoint providing basic API information.
+    
+    Returns:
+        dict: Basic API metadata and status
+    """
+    return {
+        "message": "HTN 2025 - AI-Powered Memory Gallery API",
+        "version": "1.0.0",
+        "status": "active",
+        "docs": "/docs"
+    }
 
-# start
+# Development server startup
 if __name__ == "__main__":
     import uvicorn
     
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Run the application with uvicorn for development
+    # In production, use a proper ASGI server like gunicorn with uvicorn workers
+    uvicorn.run(
+        app, 
+        host="0.0.0.0", 
+        port=8000,
+        reload=True  # Enable auto-reload for development
+    )
