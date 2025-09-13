@@ -1,5 +1,6 @@
 import asyncio
 from contextlib import asynccontextmanager
+import os
 from typing import List
 
 from app.routers.image import router as image_router
@@ -44,8 +45,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Create images directory if it doesn't exist
+os.makedirs("images", exist_ok=True)
+
 # Mount static files for images
-app.mount("/images", StaticFiles(directory="../images"), name="images")
+app.mount("/images", StaticFiles(directory="images"), name="images")
 
 # Include routers
 app.include_router(image_router)
