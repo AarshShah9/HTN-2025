@@ -31,6 +31,10 @@ const MemoryGallery: React.FC = () => {
     );
   };
 
+  const handleClearAllTags = () => {
+    setSelectedTags([]);
+  };
+
   const handleSortChange = (order: 'asc' | 'desc') => {
     setSortOrder(order);
   };
@@ -67,6 +71,7 @@ const MemoryGallery: React.FC = () => {
               onSearchChange={handleSearchChange}
               selectedTags={selectedTags}
               onTagToggle={handleTagToggle}
+              onClearAllTags={handleClearAllTags}
               sortOrder={sortOrder}
               onSortChange={handleSortChange}
               availableTags={availableTags}
