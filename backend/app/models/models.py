@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 from datetime import datetime
-import uuid
 
 class ImageBase(BaseModel):
     description: Optional[str] = None
@@ -25,11 +24,3 @@ class ImageResponse(ImageBase):
     
     class Config:
         from_attributes = True
-
-# Legacy model for backward compatibility
-class Image(BaseModel):
-    id: str
-    url: str
-    description: str
-    created_at: str
-    tags: list[str] = []
