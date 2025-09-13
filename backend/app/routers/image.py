@@ -4,7 +4,7 @@ This module handles image upload functionality, including:
 - Base64 image data processing
 - File system storage management
 - Database record creation
-- Audio-based image search (placeholder)
+-    db: AsyncSession = Depends(get_db_session),Audio-based image search (placeholder)
 """
 
 import base64
@@ -15,9 +15,11 @@ from typing import List, Optional
 from database.database import get_db_session
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.image import ImageResponse, ImageUpdate
-from app.repository.image_repository import ImageRepository, get_image_repository
+
+from app.models.models import ImageResponse, ImageUpdate
 from app.repository.audio_repository import AudioRepository
+from app.repository.image_repository import ImageRepository
+
 from ..utils.transcription import transcribe_audio_from_bytes
 
 # Create router with image-specific prefix and tags
@@ -194,9 +196,7 @@ async def search_images_by_tags(
 
 @router.get("/images_by_audio")
 async def get_images_by_audio(
-    audio_description: str,
-    limit: int = 2,
-    db: AsyncSession = Depends(get_db)
+    audio_description: str, limit: int = 2, db: AsyncSession = Depends(get_db_session)
 ):
     """Search for images based on audio description using semantic similarity.
 
@@ -216,20 +216,16 @@ async def get_images_by_audio(
         GET /api/images_by_audio?audio_description=a%20dog%20barking%20loudly
     """
     if not audio_description.strip():
-        raise HTTPException(
-            status_code=400,
-            detail="Audio description cannot be empty"
-        )
-    
+        raise HTTPException(status_code=400, detail="Audio description cannot be empty")
+
     # Get images with similar audio embeddings
     repo = ImageRepository(db)
     images = await repo.get_images_by_audio(
         audio_description=audio_description,
-        limit=min(limit, 10)  # Cap limit at 10 for performance
+        limit=min(limit, 10),  # Cap limit at 10 for performance
     )
-    
-    return [schemas.Image.from_orm(img) for img in images]
-    
+
+    return [ImageResponse.model_validate(img) for img in images]
 
 
 @router.put("/{image_id}", response_model=ImageResponse)
