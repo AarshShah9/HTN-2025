@@ -43,14 +43,13 @@ const MemoryGallery: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">Memory App</h1>
-          <p className="text-muted-foreground text-lg">
-            Cherish your precious moments and memories
-          </p>
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold mb-2">Memory Gallery</h1>
+        <p className="text-muted-foreground text-lg">
+          Cherish your precious moments and memories
+        </p>
+      </div>
 
         {loading && <MemoryLoading />}
 
@@ -87,7 +86,6 @@ const MemoryGallery: React.FC = () => {
             />
           </>
         )}
-      </div>
     </div>
   );
 };
