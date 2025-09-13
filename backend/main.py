@@ -1,6 +1,7 @@
 from app.routers.image import router as image_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="HTN 2025", version="1.0.0")
 
@@ -12,6 +13,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount static files for images
+app.mount("/images", StaticFiles(directory="../images"), name="images")
 
 # Include routers
 app.include_router(image_router)
