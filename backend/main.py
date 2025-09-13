@@ -106,6 +106,9 @@ if __name__ == "__main__":
 
     # Run the application with uvicorn for development
     # In production, use a proper ASGI server like gunicorn with uvicorn workers
+    app.config['MAX_CONTENT_LENGTH'] = None
+
+
     uvicorn.run(
         app,
         host="0.0.0.0",
