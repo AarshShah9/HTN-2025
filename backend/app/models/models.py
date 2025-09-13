@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ImageBase(BaseModel):
@@ -29,8 +29,7 @@ class ImageResponse(ImageBase):
     path: str
     timestamp: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class VideoBase(BaseModel):
@@ -40,7 +39,9 @@ class VideoBase(BaseModel):
     tagged: bool = False
     fps: float = Field(default=60.0, gt=0)
     duration: Optional[float] = Field(default=None, ge=0)
-    audio: Optional[str] = Field(default=None, description="Base64 encoded WAV audio at 44100 sample rate")
+    audio: Optional[str] = Field(
+        default=None, description="Base64 encoded WAV audio at 44100 sample rate"
+    )
     latitude: Optional[float] = Field(default=None, ge=-90, le=90)
     longitude: Optional[float] = Field(default=None, ge=-180, le=180)
 
@@ -58,7 +59,9 @@ class VideoUpdate(BaseModel):
     tagged: Optional[bool] = None
     fps: Optional[float] = Field(default=None, gt=0)
     duration: Optional[float] = Field(default=None, ge=0)
-    audio: Optional[str] = Field(default=None, description="Base64 encoded WAV audio at 44100 sample rate")
+    audio: Optional[str] = Field(
+        default=None, description="Base64 encoded WAV audio at 44100 sample rate"
+    )
 
 
 class VideoResponse(VideoBase):
@@ -66,5 +69,4 @@ class VideoResponse(VideoBase):
     frames: List[str]
     timestamp: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
