@@ -78,24 +78,3 @@ def base64_to_image(base64_string: str, output_path: str) -> bool:
     except Exception as e:
         print(f"Error converting base64 to image: {str(e)}")
         return False
-
-
-if __name__ == "__main__":
-    # Test both functions
-    image_path = "360_F_97589769_t45CqXyzjz0KXwoBZT9PRaWGHRk5hQqQ.webp"
-
-    # Convert image to base64
-    base64_str = image_to_base64(image_path)
-    if base64_str:
-        print(f"Base64 conversion successful. Length: {len(base64_str)} characters")
-        print(f"First 50 chars: {base64_str[:50]}...")
-
-        # Convert back to image
-        output_path = "/test"
-        success = base64_to_image(base64_str, output_path)
-        if success:
-            print(f"Successfully converted back to image: {output_path}")
-        else:
-            print("Failed to convert back to image")
-    else:
-        print("Failed to convert image to base64")

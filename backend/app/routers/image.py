@@ -1,17 +1,24 @@
-import json
 import os
 import uuid
-from datetime import datetime
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..models.models import Image
+from ..models.models import ImageResponse
+from ..repository.image_repository import ImageRepository
+from database.database import get_db_session
 
 router = APIRouter(prefix="/image", tags=["image"])
 
 
-@router.post("/upload")
-async def upload_image(base64_data: str, description: str = ""):
+def get_image_repository(session: AsyncSession = Depends(get_db_session)) -> ImageRepository:
+    return ImageRepository(session)
+
+@router.post("/upload", response_model=ImageResponse)
+async def upload_image(
+    base64_data: str, 
+    repository: ImageRepository = Depends(get_image_repository)
+):
     # Generate unique ID
     image_id = str(uuid.uuid4())
 
@@ -23,33 +30,17 @@ async def upload_image(base64_data: str, description: str = ""):
     with open(filepath, "w") as f:
         f.write(base64_data)
 
-    # Create image metadata
-    created_at = datetime.now().isoformat()
-    image = Image(
-        id=image_id,
-        url=filepath,
-        description=description,
-        created_at=created_at,
-        tags=[],
+    # Create image record in database
+    image_record = await repository.create_image(
+        path=filename,  # Store relative path to the file
+        description=None,
+        tags=[],  # Empty tags initially
+        embeddings=None,  # No embeddings initially
+        tagged=False  # Not tagged initially
     )
-
-    # Load existing metadata
-    metadata_path = "images/metadata.json"
-    if os.path.exists(metadata_path):
-        with open(metadata_path, "r") as f:
-            metadata = json.load(f)
-    else:
-        metadata = []
-
-    # Append new image
-    metadata.append(image.dict())
-
-    # Save metadata
-    with open(metadata_path, "w") as f:
-        json.dump(metadata, f, indent=4)
-
-    return image
-
+    
+    # Return the created image record
+    return ImageResponse.from_orm(image_record)
 
 @router.get("/images_by_audio")
 def get_images_by_audio(audio_description: str):
