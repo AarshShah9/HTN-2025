@@ -18,6 +18,7 @@ from database.models import AudioModel
 from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from ..utils.embedding import generate_text_embedding, calculate_cosine_similarity
 
 
 class AudioRepository:
@@ -49,14 +50,20 @@ class AudioRepository:
             transcription: Natural language transcription text
 
         Returns:
-            AudioModel: The created audio record with generated ID and timestamp
+            AudioModel: The created audio record with generated ID, timestamp, and embedding
 
         Raises:
             SQLAlchemyError: If database operation fails
         """
+        # Generate embedding from transcription if available
+        embedding = None
+        if transcription and transcription.strip():
+            embedding = generate_text_embedding(transcription)
+
         # Create new audio model instance
         audio = AudioModel(
             transcription=transcription,
+            embedding=embedding,
             timestamp=datetime.utcnow(),
         )
 
@@ -99,6 +106,79 @@ class AudioRepository:
         )
         return list(result.scalars().all())
 
+    async def search_audio_by_similarity(
+        self, query_text: str, threshold: float = 0.7, limit: int = 10
+    ) -> List[tuple[AudioModel, float]]:
+        """Search audio records by embedding similarity to query text.
+
+        Args:
+            query_text: Text to search for similar audio transcriptions
+            threshold: Minimum similarity score (0.0 to 1.0)
+            limit: Maximum number of results to return
+
+        Returns:
+            List[tuple[AudioModel, float]]: List of (audio_record, similarity_score) tuples
+                                           sorted by similarity score (highest first)
+        """
+        # Generate embedding for the query text
+        query_embedding = generate_text_embedding(query_text)
+        if not query_embedding:
+            return []
+
+        # Get all audio records that have embeddings
+        result = await self.session.execute(
+            select(AudioModel)
+            .where(AudioModel.embedding.is_not(None))
+            .where(AudioModel.transcription.is_not(None))
+            .where(AudioModel.transcription != "")
+        )
+        audio_records = list(result.scalars().all())
+
+        # Calculate similarity scores
+        similarities = []
+        for audio in audio_records:
+            if audio.embedding:
+                similarity = calculate_cosine_similarity(query_embedding, audio.embedding)
+                if similarity >= threshold:
+                    similarities.append((audio, similarity))
+
+        # Sort by similarity score (highest first) and limit results
+        similarities.sort(key=lambda x: x[1], reverse=True)
+        return similarities[:limit]
+
+    async def get_images_by_audio_similarity(
+        self, query_text: str, threshold: float = 0.7, limit: int = 10
+    ) -> List[str]:
+        """Get image IDs that are associated with audio similar to the query text.
+
+        Args:
+            query_text: Text to search for similar audio transcriptions
+            threshold: Minimum similarity score (0.0 to 1.0)
+            limit: Maximum number of results to return
+
+        Returns:
+            List[str]: List of image IDs associated with similar audio
+        """
+        # Get similar audio records
+        similar_audio = await self.search_audio_by_similarity(query_text, threshold, limit)
+        
+        # Extract audio IDs
+        audio_ids = [audio.id for audio, _ in similar_audio]
+        
+        if not audio_ids:
+            return []
+
+        # Import here to avoid circular imports
+        from database.models import ImageModel
+        
+        # Find images that reference these audio IDs
+        result = await self.session.execute(
+            select(ImageModel.id)
+            .where(ImageModel.audio_id.in_(audio_ids))
+        )
+        
+        return [image_id for image_id in result.scalars().all()]
+
     async def search_audio_by_transcription(
         self, search_term: str, skip: int = 0, limit: int = 100
     ) -> List[AudioModel]:
@@ -121,6 +201,79 @@ class AudioRepository:
         )
         return list(result.scalars().all())
 
+    async def search_audio_by_similarity(
+        self, query_text: str, threshold: float = 0.7, limit: int = 10
+    ) -> List[tuple[AudioModel, float]]:
+        """Search audio records by embedding similarity to query text.
+
+        Args:
+            query_text: Text to search for similar audio transcriptions
+            threshold: Minimum similarity score (0.0 to 1.0)
+            limit: Maximum number of results to return
+
+        Returns:
+            List[tuple[AudioModel, float]]: List of (audio_record, similarity_score) tuples
+                                           sorted by similarity score (highest first)
+        """
+        # Generate embedding for the query text
+        query_embedding = generate_text_embedding(query_text)
+        if not query_embedding:
+            return []
+
+        # Get all audio records that have embeddings
+        result = await self.session.execute(
+            select(AudioModel)
+            .where(AudioModel.embedding.is_not(None))
+            .where(AudioModel.transcription.is_not(None))
+            .where(AudioModel.transcription != "")
+        )
+        audio_records = list(result.scalars().all())
+
+        # Calculate similarity scores
+        similarities = []
+        for audio in audio_records:
+            if audio.embedding:
+                similarity = calculate_cosine_similarity(query_embedding, audio.embedding)
+                if similarity >= threshold:
+                    similarities.append((audio, similarity))
+
+        # Sort by similarity score (highest first) and limit results
+        similarities.sort(key=lambda x: x[1], reverse=True)
+        return similarities[:limit]
+
+    async def get_images_by_audio_similarity(
+        self, query_text: str, threshold: float = 0.7, limit: int = 10
+    ) -> List[str]:
+        """Get image IDs that are associated with audio similar to the query text.
+
+        Args:
+            query_text: Text to search for similar audio transcriptions
+            threshold: Minimum similarity score (0.0 to 1.0)
+            limit: Maximum number of results to return
+
+        Returns:
+            List[str]: List of image IDs associated with similar audio
+        """
+        # Get similar audio records
+        similar_audio = await self.search_audio_by_similarity(query_text, threshold, limit)
+        
+        # Extract audio IDs
+        audio_ids = [audio.id for audio, _ in similar_audio]
+        
+        if not audio_ids:
+            return []
+
+        # Import here to avoid circular imports
+        from database.models import ImageModel
+        
+        # Find images that reference these audio IDs
+        result = await self.session.execute(
+            select(ImageModel.id)
+            .where(ImageModel.audio_id.in_(audio_ids))
+        )
+        
+        return [image_id for image_id in result.scalars().all()]
+
     async def update_audio(
         self,
         audio_id: Union[UUID, str],
@@ -140,6 +293,12 @@ class AudioRepository:
 
         if transcription is not None:
             update_data[AudioModel.transcription] = transcription
+            # Generate new embedding when transcription is updated
+            if transcription.strip():
+                embedding = generate_text_embedding(transcription)
+                update_data[AudioModel.embedding] = embedding
+            else:
+                update_data[AudioModel.embedding] = None
 
         if not update_data:
             return await self.get_audio_by_id(audio_id)
@@ -192,6 +351,79 @@ class AudioRepository:
         )
         return list(result.scalars().all())
 
+    async def search_audio_by_similarity(
+        self, query_text: str, threshold: float = 0.7, limit: int = 10
+    ) -> List[tuple[AudioModel, float]]:
+        """Search audio records by embedding similarity to query text.
+
+        Args:
+            query_text: Text to search for similar audio transcriptions
+            threshold: Minimum similarity score (0.0 to 1.0)
+            limit: Maximum number of results to return
+
+        Returns:
+            List[tuple[AudioModel, float]]: List of (audio_record, similarity_score) tuples
+                                           sorted by similarity score (highest first)
+        """
+        # Generate embedding for the query text
+        query_embedding = generate_text_embedding(query_text)
+        if not query_embedding:
+            return []
+
+        # Get all audio records that have embeddings
+        result = await self.session.execute(
+            select(AudioModel)
+            .where(AudioModel.embedding.is_not(None))
+            .where(AudioModel.transcription.is_not(None))
+            .where(AudioModel.transcription != "")
+        )
+        audio_records = list(result.scalars().all())
+
+        # Calculate similarity scores
+        similarities = []
+        for audio in audio_records:
+            if audio.embedding:
+                similarity = calculate_cosine_similarity(query_embedding, audio.embedding)
+                if similarity >= threshold:
+                    similarities.append((audio, similarity))
+
+        # Sort by similarity score (highest first) and limit results
+        similarities.sort(key=lambda x: x[1], reverse=True)
+        return similarities[:limit]
+
+    async def get_images_by_audio_similarity(
+        self, query_text: str, threshold: float = 0.7, limit: int = 10
+    ) -> List[str]:
+        """Get image IDs that are associated with audio similar to the query text.
+
+        Args:
+            query_text: Text to search for similar audio transcriptions
+            threshold: Minimum similarity score (0.0 to 1.0)
+            limit: Maximum number of results to return
+
+        Returns:
+            List[str]: List of image IDs associated with similar audio
+        """
+        # Get similar audio records
+        similar_audio = await self.search_audio_by_similarity(query_text, threshold, limit)
+        
+        # Extract audio IDs
+        audio_ids = [audio.id for audio, _ in similar_audio]
+        
+        if not audio_ids:
+            return []
+
+        # Import here to avoid circular imports
+        from database.models import ImageModel
+        
+        # Find images that reference these audio IDs
+        result = await self.session.execute(
+            select(ImageModel.id)
+            .where(ImageModel.audio_id.in_(audio_ids))
+        )
+        
+        return [image_id for image_id in result.scalars().all()]
+
     async def get_audio_with_transcription(
         self, skip: int = 0, limit: int = 100
     ) -> List[AudioModel]:
@@ -213,6 +445,79 @@ class AudioRepository:
             .limit(limit)
         )
         return list(result.scalars().all())
+
+    async def search_audio_by_similarity(
+        self, query_text: str, threshold: float = 0.7, limit: int = 10
+    ) -> List[tuple[AudioModel, float]]:
+        """Search audio records by embedding similarity to query text.
+
+        Args:
+            query_text: Text to search for similar audio transcriptions
+            threshold: Minimum similarity score (0.0 to 1.0)
+            limit: Maximum number of results to return
+
+        Returns:
+            List[tuple[AudioModel, float]]: List of (audio_record, similarity_score) tuples
+                                           sorted by similarity score (highest first)
+        """
+        # Generate embedding for the query text
+        query_embedding = generate_text_embedding(query_text)
+        if not query_embedding:
+            return []
+
+        # Get all audio records that have embeddings
+        result = await self.session.execute(
+            select(AudioModel)
+            .where(AudioModel.embedding.is_not(None))
+            .where(AudioModel.transcription.is_not(None))
+            .where(AudioModel.transcription != "")
+        )
+        audio_records = list(result.scalars().all())
+
+        # Calculate similarity scores
+        similarities = []
+        for audio in audio_records:
+            if audio.embedding:
+                similarity = calculate_cosine_similarity(query_embedding, audio.embedding)
+                if similarity >= threshold:
+                    similarities.append((audio, similarity))
+
+        # Sort by similarity score (highest first) and limit results
+        similarities.sort(key=lambda x: x[1], reverse=True)
+        return similarities[:limit]
+
+    async def get_images_by_audio_similarity(
+        self, query_text: str, threshold: float = 0.7, limit: int = 10
+    ) -> List[str]:
+        """Get image IDs that are associated with audio similar to the query text.
+
+        Args:
+            query_text: Text to search for similar audio transcriptions
+            threshold: Minimum similarity score (0.0 to 1.0)
+            limit: Maximum number of results to return
+
+        Returns:
+            List[str]: List of image IDs associated with similar audio
+        """
+        # Get similar audio records
+        similar_audio = await self.search_audio_by_similarity(query_text, threshold, limit)
+        
+        # Extract audio IDs
+        audio_ids = [audio.id for audio, _ in similar_audio]
+        
+        if not audio_ids:
+            return []
+
+        # Import here to avoid circular imports
+        from database.models import ImageModel
+        
+        # Find images that reference these audio IDs
+        result = await self.session.execute(
+            select(ImageModel.id)
+            .where(ImageModel.audio_id.in_(audio_ids))
+        )
+        
+        return [image_id for image_id in result.scalars().all()]
 
     async def get_audio_without_transcription(
         self, skip: int = 0, limit: int = 100
@@ -236,3 +541,76 @@ class AudioRepository:
             .limit(limit)
         )
         return list(result.scalars().all())
+
+    async def search_audio_by_similarity(
+        self, query_text: str, threshold: float = 0.7, limit: int = 10
+    ) -> List[tuple[AudioModel, float]]:
+        """Search audio records by embedding similarity to query text.
+
+        Args:
+            query_text: Text to search for similar audio transcriptions
+            threshold: Minimum similarity score (0.0 to 1.0)
+            limit: Maximum number of results to return
+
+        Returns:
+            List[tuple[AudioModel, float]]: List of (audio_record, similarity_score) tuples
+                                           sorted by similarity score (highest first)
+        """
+        # Generate embedding for the query text
+        query_embedding = generate_text_embedding(query_text)
+        if not query_embedding:
+            return []
+
+        # Get all audio records that have embeddings
+        result = await self.session.execute(
+            select(AudioModel)
+            .where(AudioModel.embedding.is_not(None))
+            .where(AudioModel.transcription.is_not(None))
+            .where(AudioModel.transcription != "")
+        )
+        audio_records = list(result.scalars().all())
+
+        # Calculate similarity scores
+        similarities = []
+        for audio in audio_records:
+            if audio.embedding:
+                similarity = calculate_cosine_similarity(query_embedding, audio.embedding)
+                if similarity >= threshold:
+                    similarities.append((audio, similarity))
+
+        # Sort by similarity score (highest first) and limit results
+        similarities.sort(key=lambda x: x[1], reverse=True)
+        return similarities[:limit]
+
+    async def get_images_by_audio_similarity(
+        self, query_text: str, threshold: float = 0.7, limit: int = 10
+    ) -> List[str]:
+        """Get image IDs that are associated with audio similar to the query text.
+
+        Args:
+            query_text: Text to search for similar audio transcriptions
+            threshold: Minimum similarity score (0.0 to 1.0)
+            limit: Maximum number of results to return
+
+        Returns:
+            List[str]: List of image IDs associated with similar audio
+        """
+        # Get similar audio records
+        similar_audio = await self.search_audio_by_similarity(query_text, threshold, limit)
+        
+        # Extract audio IDs
+        audio_ids = [audio.id for audio, _ in similar_audio]
+        
+        if not audio_ids:
+            return []
+
+        # Import here to avoid circular imports
+        from database.models import ImageModel
+        
+        # Find images that reference these audio IDs
+        result = await self.session.execute(
+            select(ImageModel.id)
+            .where(ImageModel.audio_id.in_(audio_ids))
+        )
+        
+        return [image_id for image_id in result.scalars().all()]

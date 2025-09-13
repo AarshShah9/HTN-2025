@@ -220,6 +220,7 @@ class AudioModel(Base):
 
     This model stores information about audio transcriptions including:
     - Transcription text
+    - Vector embeddings for semantic search
     - Unique UUID identifier for the audio
     - Timestamp of when the audio record was created
     """
@@ -240,6 +241,7 @@ class AudioModel(Base):
 
     # Transcription data
     transcription = Column(Text, nullable=True)  # Natural language transcription
+    embedding = Column(JSON, nullable=True)  # Vector embeddings for semantic search
 
     def __repr__(self):
         """String representation of the AudioModel instance.

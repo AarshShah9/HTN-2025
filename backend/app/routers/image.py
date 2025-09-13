@@ -13,12 +13,13 @@ import base64
 from typing import List, Optional
 
 from database.database import get_db_session
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from ..models.models import ImageResponse, ImageUpdate
-from ..repository.image_repository import ImageRepository
-from ..repository.audio_repository import AudioRepository
+from typing import List, Optional
+from app.schemas import image as schemas
+from app.schemas.image import ImageResponse, ImageUpdate, ImageCreate
+from app.repository.image_repository import ImageRepository, get_image_repository
+from app.database.database import get_db
 from ..utils.transcription import transcribe_audio_from_bytes
 
 # Create router with image-specific prefix and tags
@@ -180,31 +181,43 @@ async def search_images_by_tags(
 
 
 @router.get("/images_by_audio")
-def get_images_by_audio(audio_description: str):
-    """Search for images based on audio description.
+async def get_images_by_audio(
+    audio_description: str,
+    limit: int = 2,
+    db: AsyncSession = Depends(get_db)
+):
+    """Search for images based on audio description using semantic similarity.
 
-    This endpoint is designed to accept audio transcriptions and match them
-    against image descriptions and tags for semantic search functionality.
-    Currently a placeholder for future implementation.
+    This endpoint takes a text description (typically from an audio transcription)
+    and finds images whose associated audio transcriptions are semantically
+    similar to the input text using vector embeddings.
 
     Args:
         audio_description: Text description derived from audio transcription
+        limit: Maximum number of results to return (default: 2)
 
     Returns:
-        dict: Search results or placeholder response
+        List[schemas.Image]: List of images with audio transcriptions most similar
+                             to the input description, ordered by similarity
 
-    Note:
-        This endpoint is not yet implemented. Future implementation should:
-        1. Process the audio description text
-        2. Generate embeddings for semantic search
-        3. Match against image descriptions and tags
-        4. Return ranked search results
+    Example:
+        GET /api/images_by_audio?audio_description=a%20dog%20barking%20loudly
     """
-    return {
-        "message": "Audio-based image search not yet implemented",
-        "query": audio_description,
-        "status": "placeholder",
-    }
+    if not audio_description.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Audio description cannot be empty"
+        )
+    
+    # Get images with similar audio embeddings
+    repo = ImageRepository(db)
+    images = await repo.get_images_by_audio(
+        audio_description=audio_description,
+        limit=min(limit, 10)  # Cap limit at 10 for performance
+    )
+    
+    return [schemas.Image.from_orm(img) for img in images]
+    
 
 
 @router.put("/{image_id}", response_model=ImageResponse)
