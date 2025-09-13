@@ -56,6 +56,8 @@ def get_audio_repository(
 async def upload_image(
     base64_data: list[str],
     audio: str,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
     repository: ImageRepository = Depends(get_image_repository),
     audio_repository: AudioRepository = Depends(get_audio_repository),
 ):
@@ -68,6 +70,8 @@ async def upload_image(
     Args:
         base64_data: Base64 encoded image data as string
         audio: Optional base64 encoded WAV audio to be transcribed and stored separately
+        latitude: Optional GPS latitude coordinate
+        longitude: Optional GPS longitude coordinate
         repository: Image repository for database operations
         audio_repository: Audio repository for database operations
 
@@ -117,6 +121,8 @@ async def upload_image(
             embeddings=None,  # No embeddings initially
             tagged=False,  # Not processed by AI yet
             audio_id=audio_id,  # Reference to AudioModel ID
+            latitude=latitude,
+            longitude=longitude,
         )
 
     # Return the created image record as response model
