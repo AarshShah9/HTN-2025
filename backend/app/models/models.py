@@ -9,7 +9,9 @@ class ImageBase(BaseModel):
     tags: List[str] = Field(default_factory=list)
     embeddings: Optional[Dict[str, Any]] = None
     tagged: bool = False
-    audio_id: Optional[str] = Field(default=None, description="Reference to AudioModel ID")
+    audio_id: Optional[str] = Field(
+        default=None, description="Reference to AudioModel ID"
+    )
     latitude: Optional[float] = Field(default=None, ge=-90, le=90)
     longitude: Optional[float] = Field(default=None, ge=-180, le=180)
 
@@ -23,7 +25,9 @@ class ImageUpdate(BaseModel):
     tags: Optional[List[str]] = None
     embeddings: Optional[Dict[str, Any]] = None
     tagged: Optional[bool] = None
-    audio_id: Optional[str] = Field(default=None, description="Reference to AudioModel ID")
+    audio_id: Optional[str] = Field(
+        default=None, description="Reference to AudioModel ID"
+    )
     latitude: Optional[float] = Field(default=None, ge=-90, le=90)
     longitude: Optional[float] = Field(default=None, ge=-180, le=180)
 
