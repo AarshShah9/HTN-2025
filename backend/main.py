@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 import os
 from typing import List
 
-from app.routers.image import router as image_router
 from app.routers.image_db import router as image_db_router
 from database.database import init_db
 from fastapi import FastAPI
@@ -58,10 +57,15 @@ os.makedirs("images", exist_ok=True)
 app.mount("/images", StaticFiles(directory="images"), name="images")
 
 # Include routers
-app.include_router(image_router)
 app.include_router(image_db_router)
 
 
 @app.get("/")
 def read_root():
     return {"message": "HTN 2025"}
+
+# start
+if __name__ == "__main__":
+    import uvicorn
+    
+    uvicorn.run(app, host="0.0.0.0", port=8000)

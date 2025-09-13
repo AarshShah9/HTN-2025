@@ -1,3 +1,5 @@
+import sys 
+sys.path.append("../..")
 from typing import List, Optional, Union
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -170,7 +172,7 @@ class ImageRepository:
         )
         return len(result.scalars().all())
     
-    async def get_image_locations(self) -> List[Tuple[float, float]]:
+    async def get_image_locations(self) -> List[tuple[float, float]]:
         """Get all image locations."""
         result = await self.session.execute(
             select(ImageModel.latitude, ImageModel.longitude)
