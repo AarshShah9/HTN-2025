@@ -13,6 +13,8 @@ class ImageModel(Base):
     description = Column(Text, nullable=True)
     path = Column(String(500), nullable=False)  # Relative path to images
     tags = Column(JSON, default=list, nullable=False)  # String array stored as JSON
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
     
     def __repr__(self):
         return f"<ImageModel(id={self.id}, path={self.path}, tagged={self.tagged})>"
