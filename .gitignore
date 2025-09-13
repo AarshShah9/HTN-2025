@@ -4,3 +4,4 @@
 **/*.db
 .vite
 node_modules
+**/images/

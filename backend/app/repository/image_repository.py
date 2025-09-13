@@ -8,10 +8,8 @@ and the database, implementing the Repository pattern for:
 - Data validation and error handling
 """
 
-import sys
 import base64
-import tempfile
-from pathlib import Path
+import sys
 
 sys.path.append("../..")
 from datetime import datetime
@@ -22,6 +20,7 @@ from database.models import ImageModel
 from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+
 from app.utils.transcription import transcribe_audio_from_bytes
 
 
@@ -201,13 +200,13 @@ class ImageRepository:
         update_data = {}
 
         if description is not None:
-            update_data[ImageModel.description] = description
+            update_data["description"] = description
         if tags is not None:
-            update_data[ImageModel.tags] = tags
+            update_data["tags"] = tags
         if embeddings is not None:
-            update_data[ImageModel.embeddings] = embeddings
+            update_data["embeddings"] = embeddings
         if tagged is not None:
-            update_data[ImageModel.tagged] = tagged
+            update_data["tagged"] = tagged
         if audio is not None:
             # Process audio transcription if audio is provided
             transcription = None
@@ -216,7 +215,9 @@ class ImageRepository:
                     # Decode base64 audio to bytes
                     audio_bytes = base64.b64decode(audio)
                     # Transcribe audio using the transcription utility
-                    transcription = transcribe_audio_from_bytes(audio_bytes, "audio.wav")
+                    transcription = transcribe_audio_from_bytes(
+                        audio_bytes, "audio.wav"
+                    )
                 except Exception as e:
                     print(f"Error transcribing audio: {str(e)}")
                     transcription = None
