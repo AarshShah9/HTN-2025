@@ -120,3 +120,4 @@ def get_image_tags_batch_as_parts(
             
     except Exception as e:
         return {"error": str(e)}
+    
