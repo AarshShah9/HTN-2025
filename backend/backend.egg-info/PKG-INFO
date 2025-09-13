@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: backend
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi[standard]>=0.116.1
+Requires-Dist: google-generativeai>=0.8.5
+Requires-Dist: supabase>=2.18.1
