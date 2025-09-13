@@ -87,34 +87,6 @@ async def upload_image(
     return ImageResponse.from_orm(image_record)
 
 
-@router.get("/images_by_audio")
-def get_images_by_audio(audio_description: str):
-    """Search for images based on audio description.
-
-    This endpoint is designed to accept audio transcriptions and match them
-    against image descriptions and tags for semantic search functionality.
-    Currently a placeholder for future implementation.
-
-    Args:
-        audio_description: Text description derived from audio transcription
-
-    Returns:
-        dict: Search results or placeholder response
-
-    Note:
-        This endpoint is not yet implemented. Future implementation should:
-        1. Process the audio description text
-        2. Generate embeddings for semantic search
-        3. Match against image descriptions and tags
-        4. Return ranked search results
-    """
-    return {
-        "message": "Audio-based image search not yet implemented",
-        "query": audio_description,
-        "status": "placeholder",
-    }
-
-
 @router.get("/{image_id}", response_model=ImageResponse)
 async def get_image(
     image_id: str, repository: ImageRepository = Depends(get_image_repository)
@@ -163,6 +135,34 @@ async def search_images_by_tags(
 
     images = await repository.search_images_by_tags(tag_list, skip=skip, limit=limit)
     return [ImageResponse.from_orm(image) for image in images]
+
+
+@router.get("/images_by_audio")
+def get_images_by_audio(audio_description: str):
+    """Search for images based on audio description.
+
+    This endpoint is designed to accept audio transcriptions and match them
+    against image descriptions and tags for semantic search functionality.
+    Currently a placeholder for future implementation.
+
+    Args:
+        audio_description: Text description derived from audio transcription
+
+    Returns:
+        dict: Search results or placeholder response
+
+    Note:
+        This endpoint is not yet implemented. Future implementation should:
+        1. Process the audio description text
+        2. Generate embeddings for semantic search
+        3. Match against image descriptions and tags
+        4. Return ranked search results
+    """
+    return {
+        "message": "Audio-based image search not yet implemented",
+        "query": audio_description,
+        "status": "placeholder",
+    }
 
 
 @router.put("/{image_id}", response_model=ImageResponse)
