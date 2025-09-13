@@ -131,3 +131,11 @@ async def get_image_stats(
         "tagged_images": tagged,
         "untagged_images": untagged
     }
+
+@router.get("/images_by_audio")
+def get_images_by_audio(audio_description: str):
+    """
+    Search for images based on audio description.
+    This endpoint matches the audio description against image descriptions and tags.
+    """
+    ...
