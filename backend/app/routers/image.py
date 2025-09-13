@@ -13,13 +13,11 @@ import uuid
 from typing import List, Optional
 
 from database.database import get_db_session
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Optional
-from app.schemas import image as schemas
-from app.schemas.image import ImageResponse, ImageUpdate, ImageCreate
+from app.schemas.image import ImageResponse, ImageUpdate
 from app.repository.image_repository import ImageRepository, get_image_repository
-from app.database.database import get_db
+from app.repository.audio_repository import AudioRepository
 from ..utils.transcription import transcribe_audio_from_bytes
 
 # Create router with image-specific prefix and tags
