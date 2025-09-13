@@ -20,8 +20,7 @@ def get_image_tags_batch_as_parts(
         Dictionary with results for batch analysis
     """
     # Configure the Gemini API
-    # api_key = os.environ.get("GOOGLE_API_KEY")
-    api_key = "AIzaSyBUh6GPvo30h-qkC9w5o-haF_GO3fdMfQU"
+    api_key = os.environ.get("GOOGLE_API_KEY")
     if not api_key:
         raise ValueError("API key must be provided or set as GOOGLE_API_KEY environment variable")
     genai.configure(api_key=api_key)
