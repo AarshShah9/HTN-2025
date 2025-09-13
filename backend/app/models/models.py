@@ -5,4 +5,4 @@ class Image(BaseModel):
     url: str
     description: str
     created_at: str
-    tags: list[str]
+    tags: list[str] = []
