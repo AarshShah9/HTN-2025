@@ -9,7 +9,7 @@ class ImageBase(BaseModel):
     tags: List[str] = Field(default_factory=list)
     embeddings: Optional[Dict[str, Any]] = None
     tagged: bool = False
-    audio: Optional[str] = Field(default=None, description="Base64 encoded WAV audio at 44100 sample rate")
+    audio: Optional[str] = Field(default=None, description="Audio transcription text")
 
 
 class ImageCreate(ImageBase):
@@ -21,7 +21,7 @@ class ImageUpdate(BaseModel):
     tags: Optional[List[str]] = None
     embeddings: Optional[Dict[str, Any]] = None
     tagged: Optional[bool] = None
-    audio: Optional[str] = Field(default=None, description="Base64 encoded WAV audio at 44100 sample rate")
+    audio: Optional[str] = Field(default=None, description="Audio transcription text")
 
 
 class ImageResponse(ImageBase):

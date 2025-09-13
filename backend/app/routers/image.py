@@ -46,7 +46,7 @@ async def upload_image(
     
     Args:
         base64_data: Base64 encoded image data as string
-        audio: Optional base64 encoded WAV audio at 44100 sample rate
+        audio: Optional base64 encoded WAV audio to be transcribed
         repository: Image repository for database operations
         
     Returns:

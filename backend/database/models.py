@@ -31,7 +31,7 @@ class ImageModel(Base):
         description (str): AI-generated natural language description
         path (str): Relative file path to the image file
         tags (list): List of AI-generated descriptive tags
-        audio (str): Base64 encoded WAV audio at 44100 sample rate (optional)
+        audio (str): Audio transcription text (optional)
         latitude (float): GPS latitude coordinate (optional)
         longitude (float): GPS longitude coordinate (optional)
     """
@@ -60,7 +60,7 @@ class ImageModel(Base):
     path = Column(String(500), nullable=False)  # Relative path to image file
 
     # Audio data (optional)
-    audio = Column(Text, nullable=True)  # Base64 encoded WAV audio at 44100 sample rate
+    audio = Column(Text, nullable=True)  # Audio transcription text
 
     # Location data (optional)
     latitude = Column(Float, nullable=True)  # GPS coordinates
