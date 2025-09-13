@@ -1,6 +1,5 @@
 // Mock memories data for demonstration - in a real app, these would come from your backend
 import { API_URL } from '../constants';
-import { mockImages } from '../lib/mockData';
 import type { MemoryImage } from '../lib/types';
 
 export type MemoriesData = {
@@ -61,8 +60,8 @@ export const fetchMemories = async (): Promise<MemoriesData> => {
     // Fallback to mock data if backend is not available
     console.log('Falling back to mock data');
     return {
-      images: mockImages,
-      totalCount: mockImages.length
+      images: [],
+      totalCount: 0
     };
   }
 };
