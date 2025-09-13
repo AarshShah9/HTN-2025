@@ -31,7 +31,7 @@ class ImageModel(Base):
         description (str): AI-generated natural language description
         path (str): Relative file path to the image file
         tags (list): List of AI-generated descriptive tags
-        audio (str): Audio transcription text (optional)
+        audio_id (str): Reference to AudioModel ID (optional)
         latitude (float): GPS latitude coordinate (optional)
         longitude (float): GPS longitude coordinate (optional)
     """
@@ -60,7 +60,7 @@ class ImageModel(Base):
     path = Column(String(500), nullable=False)  # Relative path to image file
 
     # Audio data (optional)
-    audio = Column(Text, nullable=True)  # Audio transcription text
+    audio_id = Column(String(36), nullable=True)  # Reference to AudioModel ID
 
     # Location data (optional)
     latitude = Column(Float, nullable=True)  # GPS coordinates
@@ -213,3 +213,38 @@ class VideoModel(Base):
         ):
             return len(frames_value) / float(fps_value)
         return 0.0
+
+
+class AudioModel(Base):
+    """SQLAlchemy model for storing audio transcription metadata.
+
+    This model stores information about audio transcriptions including:
+    - Transcription text
+    - Unique UUID identifier for the audio
+    - Timestamp of when the audio record was created
+    """
+
+    __tablename__ = "audio"
+
+    # Primary key - UUID stored as string for compatibility
+    id = Column(
+        String(36),
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
+        unique=True,
+        nullable=False,
+    )
+
+    # Metadata fields
+    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Transcription data
+    transcription = Column(Text, nullable=True)  # Natural language transcription
+
+    def __repr__(self):
+        """String representation of the AudioModel instance.
+
+        Returns:
+            str: Human-readable representation showing key fields
+        """
+        return f"<AudioModel(id={self.id}, transcription={self.transcription[:20]})>"

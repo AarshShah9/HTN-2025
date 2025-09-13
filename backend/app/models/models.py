@@ -9,7 +9,7 @@ class ImageBase(BaseModel):
     tags: List[str] = Field(default_factory=list)
     embeddings: Optional[Dict[str, Any]] = None
     tagged: bool = False
-    audio: Optional[str] = Field(default=None, description="Audio transcription text")
+    audio_id: Optional[str] = Field(default=None, description="Reference to AudioModel ID")
 
 
 class ImageCreate(ImageBase):
@@ -21,7 +21,7 @@ class ImageUpdate(BaseModel):
     tags: Optional[List[str]] = None
     embeddings: Optional[Dict[str, Any]] = None
     tagged: Optional[bool] = None
-    audio: Optional[str] = Field(default=None, description="Audio transcription text")
+    audio_id: Optional[str] = Field(default=None, description="Reference to AudioModel ID")
 
 
 class ImageResponse(ImageBase):

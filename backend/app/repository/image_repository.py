@@ -50,7 +50,7 @@ class ImageRepository:
         tags: Optional[List[str]] = None,
         embeddings: Optional[dict] = None,
         tagged: bool = False,
-        audio: Optional[str] = None,
+        audio_id: Optional[str] = None,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
     ) -> ImageModel:
@@ -62,7 +62,7 @@ class ImageRepository:
             tags: List of descriptive tags (defaults to empty list)
             embeddings: Optional vector embeddings for semantic search
             tagged: Whether the image has been processed by AI (default: False)
-            audio: Optional base64 encoded WAV audio to be transcribed
+            audio_id: Optional reference to AudioModel ID
             latitude: Optional GPS latitude coordinate
             longitude: Optional GPS longitude coordinate
 
@@ -75,17 +75,6 @@ class ImageRepository:
         if tags is None:
             tags = []
 
-        # Process audio transcription if audio is provided
-        transcription = None
-        if audio:
-            try:
-                # Decode base64 audio to bytes
-                audio_bytes = base64.b64decode(audio)
-                # Transcribe audio using the transcription utility
-                transcription = transcribe_audio_from_bytes(audio_bytes, "audio.wav")
-            except Exception as e:
-                print(f"Error transcribing audio: {str(e)}")
-                transcription = None
 
         # Create new image model instance
         image = ImageModel(
@@ -94,7 +83,7 @@ class ImageRepository:
             tags=tags,
             embeddings=embeddings,
             tagged=tagged,
-            audio=transcription,  # Store transcription text instead of raw audio
+            audio_id=audio_id,  # Store reference to AudioModel ID
             timestamp=datetime.utcnow(),
             latitude=latitude,
             longitude=longitude,
@@ -193,7 +182,7 @@ class ImageRepository:
         tags: Optional[List[str]] = None,
         embeddings: Optional[dict] = None,
         tagged: Optional[bool] = None,
-        audio: Optional[str] = None,
+        audio_id: Optional[str] = None,
     ) -> Optional[ImageModel]:
         """Update an image record."""
         id_str = str(image_id) if isinstance(image_id, UUID) else image_id
@@ -207,21 +196,8 @@ class ImageRepository:
             update_data["embeddings"] = embeddings
         if tagged is not None:
             update_data["tagged"] = tagged
-        if audio is not None:
-            # Process audio transcription if audio is provided
-            transcription = None
-            if audio:
-                try:
-                    # Decode base64 audio to bytes
-                    audio_bytes = base64.b64decode(audio)
-                    # Transcribe audio using the transcription utility
-                    transcription = transcribe_audio_from_bytes(
-                        audio_bytes, "audio.wav"
-                    )
-                except Exception as e:
-                    print(f"Error transcribing audio: {str(e)}")
-                    transcription = None
-            update_data[ImageModel.audio] = transcription
+        if audio_id is not None:
+            update_data[ImageModel.audio_id] = audio_id
 
         if not update_data:
             return await self.get_image_by_id(image_id)
