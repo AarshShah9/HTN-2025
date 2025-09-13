@@ -8,10 +8,8 @@ and the database, implementing the Repository pattern for:
 - Data validation and error handling
 """
 
-import sys
 import base64
-import tempfile
-from pathlib import Path
+import sys
 
 sys.path.append("../..")
 from datetime import datetime
@@ -22,6 +20,7 @@ from database.models import ImageModel
 from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+
 from app.utils.transcription import transcribe_audio_from_bytes
 
 
@@ -190,13 +189,13 @@ class ImageRepository:
         update_data = {}
 
         if description is not None:
-            update_data[ImageModel.description] = description
+            update_data["description"] = description
         if tags is not None:
-            update_data[ImageModel.tags] = tags
+            update_data["tags"] = tags
         if embeddings is not None:
-            update_data[ImageModel.embeddings] = embeddings
+            update_data["embeddings"] = embeddings
         if tagged is not None:
-            update_data[ImageModel.tagged] = tagged
+            update_data["tagged"] = tagged
         if audio_id is not None:
             update_data[ImageModel.audio_id] = audio_id
 
