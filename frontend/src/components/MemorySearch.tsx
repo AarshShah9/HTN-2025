@@ -10,6 +10,7 @@ type MemorySearchProps = {
   onSearchChange: (term: string) => void;
   selectedTags: string[];
   onTagToggle: (tag: string) => void;
+  onClearAllTags: () => void;
   sortOrder: SortOrder;
   onSortChange: (order: SortOrder) => void;
   availableTags: string[];
@@ -21,6 +22,7 @@ const MemorySearch: React.FC<MemorySearchProps> = ({
   onSearchChange,
   selectedTags,
   onTagToggle,
+  onClearAllTags,
   sortOrder,
   onSortChange,
   availableTags,
@@ -98,10 +100,9 @@ const MemorySearch: React.FC<MemorySearchProps> = ({
             size="sm"
             onClick={() => {
               onSearchChange('');
-              // Clear selected tags by toggling them off
-              selectedTags.forEach(tag => onTagToggle(tag));
+              onClearAllTags();
             }}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground cursor-pointer"
           >
             Clear all
           </Button>

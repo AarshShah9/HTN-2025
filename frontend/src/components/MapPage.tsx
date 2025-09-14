@@ -47,8 +47,8 @@ const createClusterIcon = (imageUrl: string, count: number) => {
       </div>
     `,
     className: 'custom-memory-marker',
-    iconSize: [60, 60],
-    iconAnchor: [20, 20],
+    iconSize: [30, 30],
+    iconAnchor: [24, 24],
     popupAnchor: [0, -30],
   });
 };
@@ -228,7 +228,7 @@ const MapPage: React.FC = () => {
                       click: () => setSelectedMemory(currentMemory.id),
                     }}
                   >
-                    <Popup className="custom-popup" minWidth={250}>
+                    <Popup className="custom-popup no-close-button" minWidth={250} closeButton={false}>
                     <div className="p-2">
                       {/* Cluster navigation header */}
                       {isCluster && (
