@@ -203,7 +203,7 @@ class ImageRepository:
         return self._enrich_images_with_base64(images)
 
     async def search_similar_audio_embeddings(
-        self, query_embedding: List[float], limit: int = 2
+        self, query_embedding: List[float], limit: int = 50
     ) -> List[Tuple[ImageModel, float]]:
         """Find images with audio embeddings most similar to the query embedding.
 
@@ -239,7 +239,7 @@ class ImageRepository:
         return scored_images[:limit]
 
     async def get_images_by_audio(
-        self, audio_description: str, limit: int = 2
+        self, audio_description: str, limit: int = 50
     ) -> List[ImageModel]:
         """Find images with audio transcriptions most similar to the given description.
 
@@ -248,12 +248,18 @@ class ImageRepository:
             limit: Maximum number of results to return
 
         Returns:
-            List of images ordered by audio similarity (most similar first)
+            List of images ordered by audio similarity (most similar first).
+            If no similar images found, returns recent images as fallback.
         """
         # Generate embedding for the query text
         query_embedding = generate_text_embedding(audio_description)
         if not query_embedding:
-            return []
+            # If embedding generation fails, return recent images
+            result = await self.session.execute(
+                select(ImageModel).order_by(ImageModel.timestamp.desc()).limit(limit)
+            )
+            images = list(result.scalars().all())
+            return self._enrich_images_with_base64(images)
 
         # Get similar audio embeddings and return corresponding images
         similar_audio = await self.search_similar_audio_embeddings(
@@ -262,6 +268,21 @@ class ImageRepository:
 
         # Extract just the images (discard similarity scores) and enrich with base64
         images = [img for img, _ in similar_audio]
+
+        # If no similar images found, return recent images as fallback
+        if not images:
+            result = await self.session.execute(
+                select(ImageModel).order_by(ImageModel.timestamp.desc()).limit(limit)
+            )
+            images = list(result.scalars().all())
+
+        return self._enrich_images_with_base64(images)
+        if not images:
+            result = await self.session.execute(
+                select(ImageModel).order_by(ImageModel.timestamp.desc()).limit(limit)
+            )
+            images = result.scalars().all()
+
         return self._enrich_images_with_base64(images)
 
     async def search_images_by_tags(

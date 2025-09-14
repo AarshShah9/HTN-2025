@@ -55,7 +55,7 @@ export const useMemorySearch = (memories: MemoryImage[]): UseMemorySearchResult 
     // Debounce the search to avoid too many API calls
     const timeoutId = setTimeout(() => {
       performSemanticSearch(searchTerm);
-    }, 500); // 500ms delay
+    }, 1000); // 1000ms delay
 
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
