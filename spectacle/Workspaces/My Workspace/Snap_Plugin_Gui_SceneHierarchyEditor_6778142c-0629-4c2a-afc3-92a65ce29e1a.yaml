@@ -1,9 +1,11 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 24
+    size: 32
     values:
-      - 0d94f882-b9e3-48e9-997a-9e8570aa5f16
+      - 0005641c-028d-459a-0000-000000014b4d
+      - 0005641c-028d-4630-0000-000000014b56
+      - 00056e79-b066-62ca-0000-000000001406
       - 24a28f9f-969f-44f1-930d-72b9ee412692
       - 24fe81e4-a75f-47e9-ad34-7b9b5b265dc6
       - 2acebaaa-3fac-44c1-a3a3-177230f575b2
@@ -17,15 +19,21 @@ CollapsedEntities:
       - 79fb391c-5e77-41dc-91b7-5cc1e7d275a9
       - 7b2f105d-1417-4886-b07d-f7adf77e1fc3
       - 88536c73-6a44-4db6-a2d0-d6df825645a6
+      - 891987a7-1ede-4839-b5cb-d5931206cb6a
       - 908a63d7-e105-42b0-a057-a96ea62d3506
       - 97737f40-3f6b-47ce-b84d-c82751fb5106
       - 9f1495e5-6740-4e74-ad16-7d33cbc0127c
       - ab08af92-0610-449f-9364-5668ba23662d
+      - b72647f7-b77f-4e09-b4f7-ae25361e499f
+      - bec767b4-d2eb-4f84-9c87-9ada0da91c24
       - c6e1396c-2c76-42c5-85d3-c55f1dffba2f
       - cbd621e5-7e5d-4cb9-a4b6-5b79a70b7ab6
+      - de2183f6-20a7-432a-8912-5d1b753a5dd1
+      - e333056f-aa45-4014-a8a6-d2fcf99deaf3
       - e34c2eaf-0439-40c6-b866-50c7b8f025e2
       - ee89a4f5-27e5-4c76-8cae-e1160686c7a8
       - f40cf529-4880-45c0-896a-e41019cef789
+      - fbb5bc88-c807-415b-92ae-011a37767600
       - ff5a156f-c1df-4b36-aad1-b9659ab21c05
   options: 4
 PinnedEntities:

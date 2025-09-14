@@ -1,0 +1,44 @@
+- !<AssetImportMetadata/31a48da8-9d93-45cf-b429-dc83dcee1ea6>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 5b000938-59f6-42b7-9fb2-b68291e3a5dc
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 5b000938-59f6-42b7-9fb2-b68291e3a5dc
+  PackageType: NotAPackage
+  PackagePolicy: CannotBeUnpacked
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 517327e2-1b7e-4ff3-847e-3531a60df99d
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/517327e2-1b7e-4ff3-847e-3531a60df99d>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: a9512200-3e7a-4246-bf90-d4ee372eac9f
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  CurrentVisibility: Editable
+  MaxVisibility: Editable
+  ScriptInputsHidden:
+    internetModule: false
+    uploadEveryNFrames: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  DefaultScriptInputs:
+    - internetModule: !<reference.InternetModule> 00000000-0000-0000-0000-000000000000
+      uploadEveryNFrames: !<float> 300.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input Asset.InternetModule internetModule
+    - // @input float uploadEveryNFrames = 10000

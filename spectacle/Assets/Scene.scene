@@ -6,10 +6,10 @@
     - !<own> 5aa0f98b-e799-448c-a2dc-cae5d04fa2a4
     - !<own> c6767c41-a40e-4b0e-8f4d-912e2f732284
     - !<own> ff5a156f-c1df-4b36-aad1-b9659ab21c05
-    - !<own> 0d94f882-b9e3-48e9-997a-9e8570aa5f16
     - !<own> e333056f-aa45-4014-a8a6-d2fcf99deaf3
     - !<own> de2183f6-20a7-432a-8912-5d1b753a5dd1
-    - !<own> 41ce5612-3734-4efe-8453-7ec0c05f2e33
+    - !<own> 891987a7-1ede-4839-b5cb-d5931206cb6a
+    - !<own> b72647f7-b77f-4e09-b4f7-ae25361e499f
   layers: !<Layers/267ee9a7-aff2-4f9d-9a49-f71214747d03>
     userLayers:
       []
@@ -716,21 +716,6 @@
   Components:
     - !<own> 9a1a8b2f-3533-4ea2-85c5-d080a34a904b
     - !<own> 21e01dc9-d46e-411d-8858-224481936ee6
-- !<SceneObject/0d94f882-b9e3-48e9-997a-9e8570aa5f16>
-  PrefabRemaps:
-    []
-  Name: AudioVideo
-  Enabled: true
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    HasSegmentScaleCompensation: false
-  Children:
-    []
-  Components:
-    - !<own> fa4aad3e-cbac-4689-abf4-78afb66b7017
 - !<SceneObject/0f704a07-d079-4984-9aaf-bf4a989b3490>
   PrefabRemaps:
     []
@@ -948,22 +933,6 @@
     - !<own> 0f704a07-d079-4984-9aaf-bf4a989b3490
   Components:
     []
-- !<ScriptComponent/11870f46-32bf-49e3-80c1-f24877c51ed3>
-  PrefabRemaps:
-    []
-  Name: BLE
-  Enabled: true
-  ScriptAsset: !<reference> 4f2d6608-6f68-493a-a05a-f54fe1de5243
-  ScriptInputsDefault:
-    {}
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      {}
-  ScriptTypes:
-    "":
-      {}
 - !<ColliderComponent/11cb9732-8d8c-4989-ae22-677933f1299f>
   PrefabRemaps:
     []
@@ -3290,6 +3259,22 @@
   ScriptTypes:
     "":
       {}
+- !<ScriptComponent/377a64d0-f5dc-4b67-8c40-bf8af6e8e8cf>
+  PrefabRemaps:
+    []
+  Name: Untitled TypeScript 3
+  Enabled: true
+  ScriptAsset: !<reference> 961f4f0b-5bcc-44f4-86ab-df29cbc02e4e
+  ScriptInputsDefault:
+    {}
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      internetModule: !<reference.InternetModule> 74d73d01-a96a-4b95-b4c9-7aa7124eb401
+  ScriptTypes:
+    "":
+      {}
 - !<ScreenTransform/37b4b788-6b02-4908-bc23-151e00c4e0d4>
   PrefabRemaps:
     []
@@ -3739,21 +3724,6 @@
     - !<own> b9209fec-b989-4422-a397-b0b560812e8e
   Components:
     []
-- !<SceneObject/41ce5612-3734-4efe-8453-7ec0c05f2e33>
-  PrefabRemaps:
-    []
-  Name: BLE
-  Enabled: true
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    HasSegmentScaleCompensation: false
-  Children:
-    []
-  Components:
-    - !<own> 11870f46-32bf-49e3-80c1-f24877c51ed3
 - !<ColliderComponent/4344aa51-7e59-47e4-a7f6-49fdf97d1433>
   PrefabRemaps:
     []
@@ -5265,6 +5235,22 @@
   BodySettingValue: 1.000000
   Damping: 0.000000
   AngularDamping: 0.000000
+- !<ScriptComponent/60044e36-7076-4dc7-b005-c6ee05803a2a>
+  PrefabRemaps:
+    []
+  Name: Untitled TypeScript 2
+  Enabled: true
+  ScriptAsset: !<reference> 03b788d5-81b2-424e-b674-c076889123b0
+  ScriptInputsDefault:
+    {}
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      {}
+  ScriptTypes:
+    "":
+      {}
 - !<RenderMeshVisual/60bdc8a7-3a1c-4d7f-bde7-0d266fd28552>
   PrefabRemaps:
     []
@@ -5285,6 +5271,23 @@
   BlendNormals: false
   BlendShapes:
     {}
+- !<ScriptComponent/617684fa-18b0-4a51-8684-118336304f9c>
+  PrefabRemaps:
+    []
+  Name: Untitled TypeScript
+  Enabled: true
+  ScriptAsset: !<reference> 5b000938-59f6-42b7-9fb2-b68291e3a5dc
+  ScriptInputsDefault:
+    uploadEveryNFrames: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      internetModule: !<reference.InternetModule> 74d73d01-a96a-4b95-b4c9-7aa7124eb401
+      uploadEveryNFrames: !<float> 300.000000
+  ScriptTypes:
+    "":
+      {}
 - !<ScreenTransform/61f63630-eae7-45de-b4db-5253920cf723>
   PrefabRemaps:
     []
@@ -7164,6 +7167,22 @@
   ScriptTypes:
     "":
       {}
+- !<SceneObject/891987a7-1ede-4839-b5cb-d5931206cb6a>
+  PrefabRemaps:
+    []
+  Name: TypeScript
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 617684fa-18b0-4a51-8684-118336304f9c
+    - !<own> 60044e36-7076-4dc7-b005-c6ee05803a2a
 - !<SceneObject/89279604-a60d-41c5-a03f-68ccd471be3d>
   PrefabRemaps:
     []
@@ -9307,6 +9326,21 @@
     - !<own> 805bb70d-0e93-48e5-a665-76bd8c8928ce
   Components:
     []
+- !<SceneObject/b72647f7-b77f-4e09-b4f7-ae25361e499f>
+  PrefabRemaps:
+    []
+  Name: wheres
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 377a64d0-f5dc-4b67-8c40-bf8af6e8e8cf
 - !<SceneObject/b74ff32e-5135-4266-b883-71d0f54a6200>
   PrefabRemaps:
     []
@@ -12703,23 +12737,6 @@
   BlendNormals: false
   BlendShapes:
     {}
-- !<ScriptComponent/fa4aad3e-cbac-4689-abf4-78afb66b7017>
-  PrefabRemaps:
-    []
-  Name: AudioVideo
-  Enabled: true
-  ScriptAsset: !<reference> a79bc800-9322-4a30-a883-c5c5350896c4
-  ScriptInputsDefault:
-    {}
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      internetModule: !<reference.InternetModule> 74d73d01-a96a-4b95-b4c9-7aa7124eb401
-      microphoneAsset: !<reference.AudioTrackAsset> 00346b06-de94-4ca7-9b15-6c9cd8fc740a
-  ScriptTypes:
-    "":
-      {}
 - !<SceneObject/fbb5bc88-c807-415b-92ae-011a37767600>
   PrefabRemaps:
     []
