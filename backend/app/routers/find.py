@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from database.database import get_db
+from database.database import get_db_session
 from database.models import ImageModel, VideoModel
 from sqlalchemy import or_, func
 
 router = APIRouter()
 
 @router.get("/find")
-def find_item(query: str, db: Session = Depends(get_db)):
+def find_item(query: str, db: Session = Depends(get_db_session)):
     """
     Searches for an item in the database by a query string.
 

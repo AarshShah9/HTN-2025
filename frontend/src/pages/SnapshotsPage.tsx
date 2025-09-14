@@ -494,25 +494,33 @@ const ConcatenatedVideoPlayer: React.FC<ConcatenatedVideoPlayerProps> = ({ video
               className={`max-w-full max-h-full object-contain rounded transition-all duration-500 ${
                 isTransitioning ? 'opacity-50 scale-105' : 'opacity-100 scale-100'
               }`}
+              onError={() => {
+                console.error('Frame load error:', {
+                  frameIndex: globalFrameIndex,
+                  frameSrc: getFrameSrc(allFrames[globalFrameIndex].frame),
+                  frameData: allFrames[globalFrameIndex].frame.substring(0, 50) + '...'
+                });
+              }}
+              onLoad={() => {
+                console.log('Frame loaded successfully:', globalFrameIndex);
+              }}
             />
           )}
           
-          {/* Play/Pause Button */}
+          {/* Play/Pause Button - Positioned in bottom right corner */}
           <button
             onClick={togglePlayback}
-            className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 hover:bg-opacity-40 transition-all duration-200"
+            className="absolute bottom-4 right-4 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 z-10"
           >
-            <div className="bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-4 shadow-lg transition-all duration-200 hover:scale-110">
-              {isPlaying ? (
-                <svg className="w-8 h-8 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              ) : (
-                <svg className="w-8 h-8 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                </svg>
-              )}
-            </div>
+            {isPlaying ? (
+              <svg className="w-6 h-6 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+              </svg>
+            )}
           </button>
         </div>
 
