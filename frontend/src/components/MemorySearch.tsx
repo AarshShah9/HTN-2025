@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowDown, ArrowUp, Filter, Search, X, Loader2, AlertCircle } from 'lucide-react';
+import { AlertCircle, ArrowDown, ArrowUp, Filter, Loader2, Search, X } from 'lucide-react';
 import React, { useState } from 'react';
 import type { SortOrder } from '../hooks/useMemorySearch';
 
