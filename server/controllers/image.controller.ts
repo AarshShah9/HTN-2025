@@ -28,7 +28,7 @@ export const uploadImageAndAudio = async (
     const { frames, audio, latitude, longitude } = ImageAndAudio.parse(
       req.body,
     );
-
+    console.log("AUDIO", audio);
     // upload audio (base64 string) to server/audio folder on disk
     const audioDir = path.join(__dirname, "..", "audio");
     if (!fs.existsSync(audioDir)) {
@@ -40,6 +40,9 @@ export const uploadImageAndAudio = async (
     const audioBuffer = Buffer.from(base64Data, "base64");
     // Write the buffer to a file.
     fs.writeFileSync(audioPath, audioBuffer);
+
+    console.log("writeFileSync", audioPath);
+    
     const transcription = await transcribeAudioWithGemini(audioPath);
     if (!transcription) {
       throw new Error("Failed to transcribe audio");
@@ -86,6 +89,7 @@ export const uploadImageAndAudio = async (
       images: imageRecords,
     });
   } catch (error) {
+    console.error("Error uploading image", error);
     res.status(500).json({ message: "Error uploading image" });
   }
 };
