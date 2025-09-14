@@ -138,19 +138,6 @@ async def upload_image(
     return ImageResponse.model_validate(image_record)
 
 
-@router.get("/{image_id}", response_model=ImageResponse)
-async def get_image_by_id(
-    image_id: str, repository: ImageRepository = Depends(get_image_repository)
-):
-    """Get an image by ID."""
-    image = await repository.get_image_by_id(image_id)
-    if not image:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Image not found"
-        )
-    return ImageResponse.model_validate(image)
-
-
 @router.get("/", response_model=List[ImageResponse])
 async def get_images(
     skip: int = 0,
@@ -171,7 +158,7 @@ async def get_images(
 
 @router.get("/images_by_transcript")
 async def get_images_by_transcript(
-    transcript: str, limit: int = 2, db: AsyncSession = Depends(get_db_session)
+    transcript: str, limit: int = 50, db: AsyncSession = Depends(get_db_session)
 ):
     """Search for images based on transcription using semantic similarity.
 
@@ -181,7 +168,7 @@ async def get_images_by_transcript(
 
     Args:
         transcript: Text description derived from audio transcription
-        limit: Maximum number of results to return (default: 2)
+        limit: Maximum number of results to return (default: 50)
 
     Returns:
         List[schemas.Image]: List of images with audio transcriptions most similar to the input description, ordered by similarity
@@ -196,10 +183,23 @@ async def get_images_by_transcript(
     repo = ImageRepository(db)
     images = await repo.get_images_by_audio(
         audio_description=transcript,
-        limit=min(limit, 10),  # Cap limit at 10 for performance
+        limit=min(limit, 50),  # Cap limit at 50 for performance
     )
 
     return [ImageResponse.model_validate(img) for img in images]
+
+
+@router.get("/{image_id}", response_model=ImageResponse)
+async def get_image_by_id(
+    image_id: str, repository: ImageRepository = Depends(get_image_repository)
+):
+    """Get an image by ID."""
+    image = await repository.get_image_by_id(image_id)
+    if not image:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Image not found"
+        )
+    return ImageResponse.model_validate(image)
 
 
 @router.put("/{image_id}", response_model=ImageResponse)

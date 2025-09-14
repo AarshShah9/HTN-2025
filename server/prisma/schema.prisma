@@ -30,6 +30,7 @@ model Video {
     tags String[]
     latitude Float?
     longitude Float?
+    frames String[]
 
     audio_id String?
     audio Audio? @relation(fields: [audio_id], references: [id])
@@ -38,7 +39,7 @@ model Video {
 model Audio {
     id String @id @default(uuid())
     transcription String?
-    embeddings Json?
+    embeddings Float[]
 
     images Image[]
     videos Video[]
