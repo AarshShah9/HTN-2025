@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+model Image {
+    id String @id @default(uuid())
+    timestamp DateTime @default(now())
+    tagged Boolean @default(false)
+    embeddings_description Json?
+    description String?
+    tags String[]
+    latitude Float?
+    longitude Float?
+
+    audio_id String?
+    audio Audio? @relation(fields: [audio_id], references: [id])
+
+    @@unique([id])
+}
+
+model Video {
+    id String @id @default(uuid())
+    timestamp DateTime @default(now())
+    description String?
+    tags String[]
+    latitude Float?
+    longitude Float?
+
+    audio_id String?
+    audio Audio? @relation(fields: [audio_id], references: [id])
+}
+
+model Audio {
+    id String @id @default(uuid())
+    transcription String?
+    embeddings Json?
+
+    images Image[]
+    videos Video[]
+}
