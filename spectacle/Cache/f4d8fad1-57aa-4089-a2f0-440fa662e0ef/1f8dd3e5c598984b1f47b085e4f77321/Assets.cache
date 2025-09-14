@@ -1,0 +1,13 @@
+- !<AssetCache>
+  AssetFiles:
+    e8483b50-bf1e-4286-907c-46f2a042b713: f4d8fad1-57aa-4089-a2f0-440fa662e0ef/1f8dd3e5c598984b1f47b085e4f77321/Data/cat.png
+  Assets:
+    - !<FileTexture/e8483b50-bf1e-4286-907c-46f2a042b713>
+      PackagePath: ""
+      FileInfo: !<FileTextureInfo>
+        Width: 2016
+        Height: 1512
+  SourceHash: 1f8dd3e5c598984b1f47b085e4f77321
+  FileHash: e3f65b6487f441bea52542876aaaccb5
+  NativePackageItems:
+    []

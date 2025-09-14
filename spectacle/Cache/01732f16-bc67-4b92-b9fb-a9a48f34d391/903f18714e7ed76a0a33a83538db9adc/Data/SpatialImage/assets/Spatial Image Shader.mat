@@ -1,0 +1,96 @@
+- !<Material/0905e455-ea59-4ff9-8b9f-81eceb08e67c>
+  PackagePath: ""
+  PassesInfo:
+    - !<own> e3ce8483-e87f-4a26-9770-7dedd222a54e
+- !<PassInfo/e3ce8483-e87f-4a26-9770-7dedd222a54e>
+  DepthWrite: true
+  DepthTest: true
+  DepthFunction: Less
+  TwoSided: true
+  ColorMask: {x: true, y: true, z: true, w: true}
+  CullMode: Back
+  PolygonOffset: {x: 0.000000, y: 0.000000}
+  FrustumCulling: Auto
+  FrustumCullPad: 0.000000
+  InstanceCount: 1
+  Defines:
+    - fadeBorder
+    - frameOn
+  BlendMode: PremultipliedAlphaAuto
+  Properties:
+    Port_Default_N045:
+      typeIdx: 1
+      value: 0.000000
+    Port_Default_N116:
+      typeIdx: 1
+      value: 1.000000
+    Port_Input1_N033:
+      typeIdx: 1
+      value: 0.000000
+    Port_Input1_N037:
+      typeIdx: 1
+      value: 0.500000
+    Port_Value1_N070:
+      typeIdx: 1
+      value: 0.000000
+    Port_Value2_N070:
+      typeIdx: 1
+      value: 0.000000
+    Port_eyeOffset_N060:
+      typeIdx: 1
+      value: 3.500000
+    PreviewEnabled:
+      typeIdx: 0
+      value: 0
+    aspectRatio:
+      typeIdx: 1
+      value: 1.200000
+    baseTex:
+      typeIdx: 9
+      value:
+        id: ffffffff-ffff-ffff-ffff-ffffffffffff
+        sampler:
+          filteringMode: Trilinear
+          wrapModeU: Repeat
+          wrapModeV: Repeat
+          wrapModeW: Repeat
+          borderColor: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+          mipmaps: false
+        type: Texture2D
+    baseTexBorderColor:
+      typeIdx: 5
+      value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    baseTexDims:
+      typeIdx: 5
+      value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    baseTexTransform:
+      typeIdx: 7
+      value:
+        0: {x: 1.000000, y: 0.000000, z: 0.000000}
+        1: {x: 0.000000, y: 1.000000, z: 0.000000}
+        2: {x: 0.000000, y: 0.000000, z: 1.000000}
+    baseTexUvMinMax:
+      typeIdx: 5
+      value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    cornerRadius:
+      typeIdx: 1
+      value: 5.000000
+    depthScale:
+      typeIdx: 1
+      value: 30.000000
+    fadeBorder:
+      typeIdx: 2
+      value: true
+    fadeSpeed:
+      typeIdx: 1
+      value: 7.000000
+    frameHeight:
+      typeIdx: 1
+      value: 60.000000
+    frameOffset:
+      typeIdx: 1
+      value: -100.000000
+    frameOn:
+      typeIdx: 2
+      value: true
+  Pass: !<reference> a934e62f-f148-498c-8a57-f8702a54a2b3

@@ -1,0 +1,28 @@
+//SG_REFLECTION_BEGIN(200)
+//attribute vec4 position 0
+//attribute vec2 texture0 3
+//attribute vec2 texture1 4
+//attribute vec3 normal 1
+//attribute vec4 tangent 2
+//sampler sampler renderTarget0SmpSC 0:20
+//sampler sampler renderTarget1SmpSC 0:21
+//sampler sampler renderTarget2SmpSC 0:22
+//sampler sampler renderTarget3SmpSC 0:23
+//texture texture2D renderTarget0 0:1:0:20
+//texture texture2D renderTarget1 0:2:0:21
+//texture texture2D renderTarget2 0:3:0:22
+//texture texture2D renderTarget3 0:4:0:23
+//spec_const bool renderTarget0HasSwappedViews 0 0
+//spec_const bool renderTarget1HasSwappedViews 1 0
+//spec_const bool renderTarget2HasSwappedViews 2 0
+//spec_const bool renderTarget3HasSwappedViews 3 0
+//spec_const int SC_DEVICE_CLASS 4 -1
+//spec_const int renderTarget0Layout 5 0
+//spec_const int renderTarget1Layout 6 0
+//spec_const int renderTarget2Layout 7 0
+//spec_const int renderTarget3Layout 8 0
+//spec_const int sc_ShaderCacheConstant 9 0
+//spec_const int sc_StereoRenderingMode 10 0
+//spec_const int sc_StereoRendering_IsClipDistanceEnabled 11 0
+//spec_const int sc_StereoViewID 12 0
+//SG_REFLECTION_END

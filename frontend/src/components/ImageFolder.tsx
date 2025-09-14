@@ -99,20 +99,10 @@ const ImageFolder: React.FC<ImageFolderProps> = ({
       {/* Folder content dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
-          <DialogHeader className="px-6 pt-6 pb-4 border-b relative">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b">
             <DialogTitle className="text-2xl">
               {remainingCount + 1} Similar Memories
             </DialogTitle>
-            <button 
-              onClick={() => setSelectedMemory(null)}
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-                <path d="M18 6 6 18" />
-                <path d="m6 6 12 12" />
-              </svg>
-              <span className="sr-only">Close</span>
-            </button>
           </DialogHeader>
           
           <div className="flex-1 overflow-y-auto p-6">

@@ -1,0 +1,156 @@
+SCC_BACKEND_SHADER_FLAGS_BEGIN__
+SCC_BACKEND_SHADER_FLAGS_END__
+//SG_REFLECTION_BEGIN(200)
+//attribute vec4 boneData 5
+//attribute vec3 blendShape0Pos 6
+//attribute vec3 blendShape0Normal 12
+//attribute vec3 blendShape1Pos 7
+//attribute vec3 blendShape1Normal 13
+//attribute vec3 blendShape2Pos 8
+//attribute vec3 blendShape2Normal 14
+//attribute vec3 blendShape3Pos 9
+//attribute vec3 blendShape4Pos 10
+//attribute vec3 blendShape5Pos 11
+//attribute vec4 position 0
+//attribute vec3 normal 1
+//attribute vec4 tangent 2
+//attribute vec2 texture0 3
+//attribute vec2 texture1 4
+//attribute vec4 color 18
+//attribute vec3 positionNext 15
+//attribute vec3 positionPrevious 16
+//attribute vec4 strandProperties 17
+//sampler sampler baseTexSmpSC 0:22
+//sampler sampler intensityTextureSmpSC 0:23
+//sampler sampler opacityTexSmpSC 0:24
+//sampler sampler sc_OITCommonSampler 0:27
+//sampler sampler sc_RayTracingHitCasterIdAndBarycentricSmpSC 0:28
+//sampler sampler sc_RayTracingRayDirectionSmpSC 0:29
+//sampler sampler sc_ScreenTextureSmpSC 0:31
+//texture texture2D baseTex 0:3:0:22
+//texture texture2D intensityTexture 0:4:0:23
+//texture texture2D opacityTex 0:5:0:24
+//texture texture2D sc_OITAlpha0 0:8:0:27
+//texture texture2D sc_OITAlpha1 0:9:0:27
+//texture texture2D sc_OITDepthHigh0 0:10:0:27
+//texture texture2D sc_OITDepthHigh1 0:11:0:27
+//texture texture2D sc_OITDepthLow0 0:12:0:27
+//texture texture2D sc_OITDepthLow1 0:13:0:27
+//texture texture2D sc_OITFilteredDepthBoundsTexture 0:14:0:27
+//texture texture2D sc_OITFrontDepthTexture 0:15:0:27
+//texture utexture2D sc_RayTracingHitCasterIdAndBarycentric 0:16:0:28
+//texture texture2D sc_RayTracingRayDirection 0:17:0:29
+//texture texture2D sc_ScreenTexture 0:19:0:31
+//texture texture2DArray baseTexArrSC 0:34:0:22
+//texture texture2DArray intensityTextureArrSC 0:35:0:23
+//texture texture2DArray opacityTexArrSC 0:36:0:24
+//texture texture2DArray sc_ScreenTextureArrSC 0:40:0:31
+//ssbo int sc_RayTracingCasterIndexBuffer 0:0:4 {
+//uint sc_RayTracingCasterTriangles 0:[1]:4
+//}
+//ssbo float sc_RayTracingCasterNonAnimatedVertexBuffer 0:2:4 {
+//float sc_RayTracingCasterNonAnimatedVertices 0:[1]:4
+//}
+//ssbo float sc_RayTracingCasterVertexBuffer 0:1:4 {
+//float sc_RayTracingCasterVertices 0:[1]:4
+//}
+//spec_const bool BLEND_MODE_AVERAGE 0 0
+//spec_const bool BLEND_MODE_BRIGHT 1 0
+//spec_const bool BLEND_MODE_COLOR 2 0
+//spec_const bool BLEND_MODE_COLOR_BURN 3 0
+//spec_const bool BLEND_MODE_COLOR_DODGE 4 0
+//spec_const bool BLEND_MODE_DARKEN 5 0
+//spec_const bool BLEND_MODE_DIFFERENCE 6 0
+//spec_const bool BLEND_MODE_DIVIDE 7 0
+//spec_const bool BLEND_MODE_DIVISION 8 0
+//spec_const bool BLEND_MODE_EXCLUSION 9 0
+//spec_const bool BLEND_MODE_FORGRAY 10 0
+//spec_const bool BLEND_MODE_HARD_GLOW 11 0
+//spec_const bool BLEND_MODE_HARD_LIGHT 12 0
+//spec_const bool BLEND_MODE_HARD_MIX 13 0
+//spec_const bool BLEND_MODE_HARD_PHOENIX 14 0
+//spec_const bool BLEND_MODE_HARD_REFLECT 15 0
+//spec_const bool BLEND_MODE_HUE 16 0
+//spec_const bool BLEND_MODE_INTENSE 17 0
+//spec_const bool BLEND_MODE_LIGHTEN 18 0
+//spec_const bool BLEND_MODE_LINEAR_LIGHT 19 0
+//spec_const bool BLEND_MODE_LUMINOSITY 20 0
+//spec_const bool BLEND_MODE_NEGATION 21 0
+//spec_const bool BLEND_MODE_NOTBRIGHT 22 0
+//spec_const bool BLEND_MODE_OVERLAY 23 0
+//spec_const bool BLEND_MODE_PIN_LIGHT 24 0
+//spec_const bool BLEND_MODE_REALISTIC 25 0
+//spec_const bool BLEND_MODE_SATURATION 26 0
+//spec_const bool BLEND_MODE_SOFT_LIGHT 27 0
+//spec_const bool BLEND_MODE_SUBTRACT 28 0
+//spec_const bool BLEND_MODE_VIVID_LIGHT 29 0
+//spec_const bool ENABLE_STIPPLE_PATTERN_TEST 30 0
+//spec_const bool NOMASK 31 0
+//spec_const bool NOTEXTURE 32 0
+//spec_const bool SC_USE_CLAMP_TO_BORDER_baseTex 33 0
+//spec_const bool SC_USE_CLAMP_TO_BORDER_intensityTexture 34 0
+//spec_const bool SC_USE_CLAMP_TO_BORDER_opacityTex 35 0
+//spec_const bool SC_USE_UV_MIN_MAX_baseTex 36 0
+//spec_const bool SC_USE_UV_MIN_MAX_intensityTexture 37 0
+//spec_const bool SC_USE_UV_MIN_MAX_opacityTex 38 0
+//spec_const bool SC_USE_UV_TRANSFORM_baseTex 39 0
+//spec_const bool SC_USE_UV_TRANSFORM_intensityTexture 40 0
+//spec_const bool SC_USE_UV_TRANSFORM_opacityTex 41 0
+//spec_const bool UseViewSpaceDepthVariant 42 1
+//spec_const bool baseTexHasSwappedViews 43 0
+//spec_const bool intensityTextureHasSwappedViews 44 0
+//spec_const bool opacityTexHasSwappedViews 45 0
+//spec_const bool sc_BlendMode_Add 46 0
+//spec_const bool sc_BlendMode_AddWithAlphaFactor 47 0
+//spec_const bool sc_BlendMode_AlphaTest 48 0
+//spec_const bool sc_BlendMode_AlphaToCoverage 49 0
+//spec_const bool sc_BlendMode_ColoredGlass 50 0
+//spec_const bool sc_BlendMode_Custom 51 0
+//spec_const bool sc_BlendMode_Max 52 0
+//spec_const bool sc_BlendMode_Min 53 0
+//spec_const bool sc_BlendMode_Multiply 54 0
+//spec_const bool sc_BlendMode_MultiplyOriginal 55 0
+//spec_const bool sc_BlendMode_Normal 56 0
+//spec_const bool sc_BlendMode_PremultipliedAlpha 57 0
+//spec_const bool sc_BlendMode_PremultipliedAlphaAuto 58 0
+//spec_const bool sc_BlendMode_PremultipliedAlphaHardware 59 0
+//spec_const bool sc_BlendMode_Screen 60 0
+//spec_const bool sc_DepthOnly 61 0
+//spec_const bool sc_FramebufferFetch 62 0
+//spec_const bool sc_MotionVectorsPass 63 0
+//spec_const bool sc_OITCompositingPass 64 0
+//spec_const bool sc_OITDepthBoundsPass 65 0
+//spec_const bool sc_OITDepthGatherPass 66 0
+//spec_const bool sc_OITDepthPrepass 67 0
+//spec_const bool sc_OITFrontLayerPass 68 0
+//spec_const bool sc_OITMaxLayers4Plus1 69 0
+//spec_const bool sc_OITMaxLayers8 70 0
+//spec_const bool sc_OITMaxLayersVisualizeLayerCount 71 0
+//spec_const bool sc_OutputBounds 72 0
+//spec_const bool sc_ProjectiveShadowsCaster 73 0
+//spec_const bool sc_ProjectiveShadowsReceiver 74 0
+//spec_const bool sc_RayTracingCasterForceOpaque 75 0
+//spec_const bool sc_RenderAlphaToColor 76 0
+//spec_const bool sc_ScreenTextureHasSwappedViews 77 0
+//spec_const bool sc_TAAEnabled 78 0
+//spec_const bool sc_VertexBlending 79 0
+//spec_const bool sc_VertexBlendingUseNormals 80 0
+//spec_const bool sc_Voxelization 81 0
+//spec_const int SC_SOFTWARE_WRAP_MODE_U_baseTex 82 -1
+//spec_const int SC_SOFTWARE_WRAP_MODE_U_intensityTexture 83 -1
+//spec_const int SC_SOFTWARE_WRAP_MODE_U_opacityTex 84 -1
+//spec_const int SC_SOFTWARE_WRAP_MODE_V_baseTex 85 -1
+//spec_const int SC_SOFTWARE_WRAP_MODE_V_intensityTexture 86 -1
+//spec_const int SC_SOFTWARE_WRAP_MODE_V_opacityTex 87 -1
+//spec_const int baseTexLayout 88 0
+//spec_const int intensityTextureLayout 89 0
+//spec_const int opacityTexLayout 90 0
+//spec_const int sc_DepthBufferMode 91 0
+//spec_const int sc_RenderingSpace 92 -1
+//spec_const int sc_ScreenTextureLayout 93 0
+//spec_const int sc_ShaderCacheConstant 94 0
+//spec_const int sc_SkinBonesCount 95 0
+//spec_const int sc_StereoRenderingMode 96 0
+//spec_const int sc_StereoRendering_IsClipDistanceEnabled 97 0
+//spec_const int sc_StereoViewID 98 0
+//SG_REFLECTION_END
