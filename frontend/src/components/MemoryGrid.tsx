@@ -86,7 +86,7 @@ const groupSimilarMemories = (
 const MemoryGrid: React.FC<MemoryGridProps> = ({
   memories,
   emptyMessage = "No memories found.",
-  similarityThreshold = 60 * 60 * 1000, // 1 hour in milliseconds
+  similarityThreshold = 60 * 60 * 500, // 1 hour in milliseconds
   minGroupSize = 2 // Minimum 2 memories to create a folder
 }) => {
   // Group similar memories
