@@ -12,6 +12,6 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ['cuddly-ladybug-innocent.ngrok-free.app'],
+    allowedHosts: ['cuddly-ladybug-innocent.ngrok-free.app', 'nonmannered-uncombinably-aleigha.ngrok-free.app'],
   },
 })

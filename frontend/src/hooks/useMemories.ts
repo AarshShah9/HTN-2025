@@ -16,6 +16,8 @@ export const useMemories = (): UseMemoriesResult => {
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
 
+  console.log(memories);
+
   const fetchMemoriesData = async () => {
     try {
       setLoading(true);

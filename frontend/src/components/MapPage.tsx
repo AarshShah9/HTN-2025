@@ -64,6 +64,7 @@ const groupMemoriesByLocation = (memories: MemoryImage[]): LocationGroup[] => {
   const locationMap = new Map<string, LocationGroup>();
   
   memories.forEach(memory => {
+    console.log(memory);
     if (memory.latitude !== undefined && memory.longitude !== undefined) {
       const key = `${memory.latitude.toFixed(6)},${memory.longitude.toFixed(6)}`;
       
