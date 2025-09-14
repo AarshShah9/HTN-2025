@@ -82,15 +82,10 @@ async def upload_image(
         HTTPException: If file saving, audio processing, or database operations fail.
     """
 
-    if not data.audio or data.audio.strip() == "":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Audio data is required"
-        )
 
     try:
-        audio_bytes = base64.b64decode(data.audio)
 
-        transcription = transcribe_audio_from_bytes(audio_bytes, "audio.wav")
+        transcription = data.transcript
 
         audio_record = await audio_repository.create_audio(transcription=transcription)
         audio_id = str(audio_record.id)

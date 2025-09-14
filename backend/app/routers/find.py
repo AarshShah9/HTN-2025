@@ -1,8 +1,17 @@
+import os
 from database.database import get_db_session
-from database.models import ImageModel, VideoModel
+from database.models import ImageModel, VideoModel, AudioModel
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+import google.generativeai as genai
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Configure Gemini
+genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 router = APIRouter()
 
@@ -10,17 +19,17 @@ router = APIRouter()
 @router.get("/find")
 async def find_item(query: str, db: AsyncSession = Depends(get_db_session)):
     """
-    Searches for an item in the database by a query string.
+    Searches for an item in the database and returns a natural language response.
 
-    The query string is searched against the tags and descriptions of both
-    images and videos. The most recent match is returned.
+    Uses Gemini Flash to generate a conversational one-sentence response about
+    where the item was last seen based on the most recent occurrence.
 
     Args:
-        query: The search term.
+        query: The search term (e.g., "keys", "phone", "wallet").
         db: The database session.
 
     Returns:
-        A message describing the last time the item was seen.
+        A natural one-sentence response about the item's location.
     """
     # Search for the query in the tags and description of images
     image_stmt = (
@@ -64,12 +73,58 @@ async def find_item(query: str, db: AsyncSession = Depends(get_db_session)):
 
     most_recent = max(candidates, key=lambda x: x.timestamp) if candidates else None
 
-    if most_recent:
-        description = most_recent.description
-        # Ensure tags is treated as a list
-        tags_list = most_recent.tags if isinstance(most_recent.tags, list) else []
-        tags = ", ".join(str(tag) for tag in tags_list)
-        media_type = "photo" if isinstance(most_recent, ImageModel) else "video"
-        return f"I last saw your {query} in a {media_type} of a {description} which contains {tags}."
-    else:
+    if not most_recent:
         raise HTTPException(status_code=404, detail=f"I could not find your {query}.")
+
+    # Gather context information
+    description = most_recent.description or "unknown scene"
+    tags_list = most_recent.tags if isinstance(most_recent.tags, list) else []
+    tags = ", ".join(str(tag) for tag in tags_list) if tags_list else "no specific tags"
+    media_type = "photo" if isinstance(most_recent, ImageModel) else "video"
+    timestamp = most_recent.timestamp.strftime("%B %d, %Y at %I:%M %p")
+    
+    # Get location info if available
+    location_info = ""
+    if most_recent.latitude and most_recent.longitude:
+        location_info = f" at coordinates {most_recent.latitude}, {most_recent.longitude}"
+    
+    # Get audio transcript if available
+    audio_info = ""
+    if hasattr(most_recent, 'audio_id') and most_recent.audio_id:
+        audio_result = await db.execute(
+            select(AudioModel.transcription)
+            .where(AudioModel.id == most_recent.audio_id)
+        )
+        audio_transcription = audio_result.scalar_one_or_none()
+        if audio_transcription and audio_transcription.strip():
+            audio_info = f" Audio captured: '{audio_transcription.strip()}'"
+
+    # Create prompt for Gemini
+    prompt = f"""
+    You are helping someone find their lost item. Based on the following information about the most recent sighting, 
+    generate ONE conversational sentence telling them where their {query} was last seen.
+
+    Item searched for: {query}
+    Media type: {media_type}
+    Scene description: {description}
+    Detected objects/tags: {tags}
+    Timestamp: {timestamp}
+    Location: {location_info if location_info else "no GPS data"}
+    {audio_info}
+
+    Generate a natural, helpful one-sentence response like "I last saw your keys..." or "Your phone was spotted..."
+    Be conversational and include the most relevant details (time, location, scene context).
+    """
+
+    try:
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                temperature=0.7,
+                max_output_tokens=100,
+            )
+        )
+        return {"message": response.text.strip()}
+    except Exception as e:
+        # Fallback response if Gemini fails
+        return {"message": f"I last saw your {query} in a {media_type} from {timestamp} showing {description}."}

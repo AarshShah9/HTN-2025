@@ -40,11 +40,10 @@ async def create_video(
         audio_id = None
 
         # Handle audio if provided
-        if video_data.audio:
+        if video_data.transcript:
             try:
                 # Transcribe the audio
-                audio_bytes = base64.b64decode(video_data.audio)
-                transcription = transcribe_audio_from_bytes(audio_bytes)
+                transcription = video_data.transcript
 
                 # Create audio record
                 audio = await audio_repo.create_audio(transcription=transcription)
@@ -55,10 +54,9 @@ async def create_video(
 
         # Create video record
         video = await video_repo.create_video(
-            frames=video_data.frames,
-            description=video_data.description,
-            tags=video_data.tags,
             tagged=video_data.tagged,
+            frames=video_data.frames,
+            tags=video_data.tags,
             fps=video_data.fps,
             duration=video_data.duration,
             audio_id=audio_id,
@@ -67,6 +65,7 @@ async def create_video(
         )
         return VideoResponse.model_validate(video)
     except Exception as e:
+        print(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to create video: {str(e)}",

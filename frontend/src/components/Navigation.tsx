@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
-import { MapPin, Grid3X3, Clock } from 'lucide-react';
+import { MapPin, Grid3X3, Clock, MessageCircle } from 'lucide-react';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
@@ -50,6 +50,17 @@ const Navigation: React.FC = () => {
               <Link to="/snapshots">
                 <Clock className="h-4 w-4" />
                 <span>Timeline</span>
+              </Link>
+            </Button>
+            
+            <Button
+              variant={location.pathname === '/chat' ? 'default' : 'ghost'}
+              asChild
+              className="flex items-center space-x-2"
+            >
+              <Link to="/chat">
+                <MessageCircle className="h-4 w-4" />
+                <span>Chat</span>
               </Link>
             </Button>
           </div>

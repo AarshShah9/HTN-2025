@@ -4,6 +4,7 @@ import MemoryGallery from './components/MemoryGallery'
 import MapPage from './components/MapPage'
 import Navigation from './components/Navigation'
 import SnapshotsPage from './pages/SnapshotsPage'
+import ChatPage from './pages/ChatPage'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<MemoryGallery />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/snapshots" element={<SnapshotsPage />} />
+          <Route path="/chat" element={<ChatPage />} />
         </Routes>
       </div>
     </Router>

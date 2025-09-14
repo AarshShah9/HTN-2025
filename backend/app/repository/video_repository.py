@@ -43,9 +43,8 @@ class VideoRepository:
     async def create_video(
         self,
         frames: List[str],
-        description: Optional[str] = None,
-        tags: Optional[List[str]] = None,
         tagged: bool = False,
+        tags: Optional[List[str]] = None,
         fps: float = 30.0,
         duration: Optional[float] = None,
         audio_id: Optional[str] = None,
@@ -81,7 +80,6 @@ class VideoRepository:
         # Create new video model instance
         video = VideoModel(
             frames=frames,
-            description=description,
             tags=tags,
             tagged=tagged,
             fps=fps,

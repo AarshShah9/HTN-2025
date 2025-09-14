@@ -65,7 +65,7 @@ class AudioRepository:
         audio = AudioModel(
             transcription=transcription,
             embedding=embedding,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(),
         )
 
         # Add to session and commit to database

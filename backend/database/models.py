@@ -132,10 +132,11 @@ class VideoModel(Base):
     )
 
     # Metadata fields
-    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
+    timestamp = Column(DateTime, default=datetime.now(), nullable=False)
 
     # AI-generated content
     tags = Column(JSON, default=list, nullable=False)  # Descriptive tags array
+    tagged = Column(Boolean, default=False, nullable=False)  # Processing status
 
     # Video data
     frames = Column(JSON, nullable=False)  # List of base64 encoded frames
