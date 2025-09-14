@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useMemories } from '../hooks/useMemories';
-import { useVideos } from '../hooks/useVideos';
+import { useLazyVideos } from '../hooks/useLazyVideos';
 import type { SnapshotItem, MemoryVideo } from '../lib/types';
 import { isVideo } from '../lib/types';
 
@@ -575,7 +575,7 @@ const ConcatenatedVideoPlayer: React.FC<ConcatenatedVideoPlayerProps> = ({ video
 
 const SnapshotsPage: React.FC = () => {
   const { memories, loading: memoriesLoading, error: memoriesError } = useMemories();
-  const { videos, loading: videosLoading, error: videosError } = useVideos();
+  const { videos, loading: videosLoading, error: videosError, totalCount: videoTotalCount, loadedCount: videoLoadedCount, isLoadingMore } = useLazyVideos();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [selectedItem, setSelectedItem] = useState<SnapshotItem | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -722,7 +722,7 @@ const SnapshotsPage: React.FC = () => {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Your Timeline</h1>
           <p className="text-gray-600">
-            Explore your captured memories • {memories.length} photos • {videos.length} videos
+            Explore your captured memories • {memories.length} photos • {videoLoadedCount}/{videoTotalCount} videos {isLoadingMore ? '(loading...)' : ''}
           </p>
         </div>
 
@@ -734,7 +734,15 @@ const SnapshotsPage: React.FC = () => {
           <div className="space-y-8">
             {/* Row 1: Carousel */}
             <div className="relative">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Memory Timeline</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-gray-800">Memory Timeline</h2>
+                {isLoadingMore && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <span>Loading videos... ({videoLoadedCount}/{videoTotalCount})</span>
+                  </div>
+                )}
+              </div>
               <div 
                 ref={scrollContainerRef} 
                 className="overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"

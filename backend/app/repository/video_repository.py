@@ -40,6 +40,10 @@ class VideoRepository:
         """
         self.session = session
 
+    async def get_all_video_ids(self) -> List[str]:
+        result = await self.session.execute(select(VideoModel.id))
+        return result.scalars().all()
+    
     async def create_video(
         self,
         frames: List[str],

@@ -53,6 +53,11 @@ async def build_video_response(
     
     return VideoResponse(**video_dict)
 
+@router.get("/ids", response_model=List[str])
+async def get_video_ids(
+    repository: VideoRepository = Depends(get_video_repository),
+):
+    return await repository.get_all_video_ids()
 
 @router.post("/", response_model=VideoResponse, status_code=status.HTTP_201_CREATED)
 async def create_video(
