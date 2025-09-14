@@ -133,10 +133,8 @@ class VideoModel(Base):
 
     # Metadata fields
     timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
-    tagged = Column(Boolean, default=False, nullable=False)  # Processing status
 
     # AI-generated content
-    description = Column(Text, nullable=True)  # Natural language description
     tags = Column(JSON, default=list, nullable=False)  # Descriptive tags array
 
     # Video data

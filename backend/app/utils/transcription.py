@@ -48,11 +48,6 @@ def transcribe_audio_with_gemini(audio_file_path: str) -> Optional[str]:
         # Upload the audio file to Gemini
         audio_file = client.files.upload(file=audio_file_path)
 
-        # Wait for the file to be processed
-        import time
-
-        time.sleep(2)  # Simple wait instead of state checking
-
         # Use Gemini to transcribe the audio
         prompt = """
         Please transcribe this audio file to text. 
