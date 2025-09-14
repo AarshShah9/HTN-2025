@@ -1,0 +1,41 @@
+- !<AssetImportMetadata/4f77df0f-44e9-46b1-9601-2c4ed79563e7>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 961f4f0b-5bcc-44f4-86ab-df29cbc02e4e
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 961f4f0b-5bcc-44f4-86ab-df29cbc02e4e
+  PackageType: NotAPackage
+  PackagePolicy: CannotBeUnpacked
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 6df9ff53-44a2-4b68-ac54-331785f3c384
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/6df9ff53-44a2-4b68-ac54-331785f3c384>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: f87a1824-ec4a-40a6-b557-f60a2fee6c62
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  CurrentVisibility: Editable
+  MaxVisibility: Editable
+  ScriptInputsHidden:
+    internetModule: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  DefaultScriptInputs:
+    - internetModule: !<reference.InternetModule> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input Asset.InternetModule internetModule

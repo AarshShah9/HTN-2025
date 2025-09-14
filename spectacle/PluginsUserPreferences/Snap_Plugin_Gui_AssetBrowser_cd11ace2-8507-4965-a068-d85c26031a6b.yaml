@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 643
+    size: 646
     values:
       - "-_- snorlax.webp"
       - AudioVideo.ts
@@ -29,6 +29,7 @@ CollapsedEntities:
       - Internet Module.internetModule
       - LoadingIndicator.ts
       - Microphone Audio.micaudio
+      - Raw Location Module.rawLocationModule
       - Render Target.renderTarget
       - Scene.scene
       - SpatialGallery.ts
@@ -619,7 +620,9 @@ CollapsedEntities:
       - SpectaclesInteractionKitExamples.lspkg/Examples/SIK Examples.prefab
       - SpectaclesInteractionKitExamples.lspkg/package.native
       - SpectaclesInteractionKitExamples.lspkg/package_dependencies.json
-      - Web View.lspkg
+      - Untitled TypeScript 2.ts
+      - Untitled TypeScript 3.ts
+      - Untitled TypeScript.ts
       - Web View.lspkg/Materials
       - Web View.lspkg/Materials/WebPlaneTexture.mat
       - Web View.lspkg/Materials/WebPlaneTexture.ss_graph
