@@ -46,7 +46,7 @@ class VideoRepository:
         description: Optional[str] = None,
         tags: Optional[List[str]] = None,
         tagged: bool = False,
-        fps: float = 60.0,
+        fps: float = 30.0,
         duration: Optional[float] = None,
         audio_id: Optional[str] = None,
         latitude: Optional[float] = None,

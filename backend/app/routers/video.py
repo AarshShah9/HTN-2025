@@ -43,8 +43,8 @@ async def create_video(
         if video_data.audio:
             try:
                 # Transcribe the audio
-                audio_bytes = base64.b64decode(video_data.audio)
-                transcription = transcribe_audio_from_bytes(audio_bytes)
+                # audio_bytes = base64.b64decode(video_data.audio)
+                transcription = transcribe_audio_from_bytes(video_data.audio)
                 
                 # Create audio record
                 audio = await audio_repo.create_audio(
