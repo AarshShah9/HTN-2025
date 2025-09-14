@@ -10,8 +10,13 @@ const Navigation: React.FC = () => {
     <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/')}>PhotaMems</h1>
+          <div className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/')}>
+            <img 
+              src="/PhotaMems.png" 
+              alt="PhotaMems" 
+              className="h-12 w-auto"
+            />
+            <h1 className="text-2xl font-bold text-primary">PhotaMems</h1>
           </div>
           
           <div className="flex items-center space-x-2">

@@ -257,7 +257,7 @@ const DetailModal: React.FC<DetailModalProps> = ({ item, onClose }) => {
           {/* Header */}
           <div className="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
             <h2 className="text-2xl font-bold text-gray-800">
-              {isVideo(item) ? '🎥 Video Memory' : '📸 Photo Memory'}
+              {isVideo(item) ? 'Video Memory' : 'Photo Memory'}
             </h2>
             <button
               onClick={onClose}
@@ -475,7 +475,7 @@ const ConcatenatedVideoPlayer: React.FC<ConcatenatedVideoPlayerProps> = ({ video
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4">
-        <h2 className="text-2xl font-bold">🎬 Your Memory Movie</h2>
+        <h2 className="text-2xl font-bold">Your Memory Movie</h2>
         <p className="text-purple-100">
           {allFrames.length} frames from {videos.length} videos
           {currentVideo && (
@@ -535,7 +535,7 @@ const ConcatenatedVideoPlayer: React.FC<ConcatenatedVideoPlayerProps> = ({ video
               />
             </div>
             <span className="text-xs">
-              {isTransitioning && "✨ Transitioning..."}
+              {isTransitioning && "Transitioning..."}
             </span>
           </div>
         </div>
@@ -705,7 +705,7 @@ const SnapshotsPage: React.FC = () => {
           <div className="space-y-8">
             {/* Row 1: Carousel */}
             <div className="relative">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">📸 Memory Timeline</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Memory Timeline</h2>
               <div 
                 ref={scrollContainerRef} 
                 className="overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
