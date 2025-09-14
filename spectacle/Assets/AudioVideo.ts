@@ -22,7 +22,7 @@ export class AudioVideo extends BaseScriptComponent {
     private accumulatedFrames: string[] = [];
 
     // Video buffer variables
-    private videoBufferSize: number = 10;
+    private videoBufferSize: number = 100;
     private videoFrameBuffer: string[] = [];
     private audioFrameBuffer: Float32Array[] = [];
     private isSending: boolean = false;
@@ -134,7 +134,7 @@ export class AudioVideo extends BaseScriptComponent {
         });
 
         try {
-            await this.internetModule.fetch(new Request('BACKEND_URL/image', {
+            await this.internetModule.fetch(new Request('http://10.37.127.253:8000/image', {
                 method: 'POST',
                 headers: { "Content-Type": "application/json" },
                 body
@@ -172,7 +172,7 @@ export class AudioVideo extends BaseScriptComponent {
                 audio: audioBase64,
             });
 
-            await this.internetModule.fetch(new Request('BACKEND_URL/video', {
+            await this.internetModule.fetch(new Request('http://10.37.127.253:8000/video', {
                 method: 'POST',
                 headers: { "Content-Type": "application/json" },
                 body

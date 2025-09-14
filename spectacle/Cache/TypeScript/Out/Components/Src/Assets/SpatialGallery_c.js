@@ -29,7 +29,7 @@ if (!global.BaseScriptComponent){
    }
 }
 var Module = require("../../../Modules/Src/Assets/SpatialGallery");
-Object.setPrototypeOf(script, Module.SpatialGallery.prototype);
+Object.setPrototypeOf(script, Module.SpatialGalleryBLE.prototype);
 script.__initialize();
 let awakeEvent = script.createEvent("OnAwakeEvent");
 awakeEvent.bind(() => {

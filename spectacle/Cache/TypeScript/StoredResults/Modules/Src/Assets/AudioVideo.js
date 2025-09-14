@@ -88,7 +88,7 @@ let AudioVideo = class AudioVideo extends BaseScriptComponent {
             latitude: 0
         });
         try {
-            await this.internetModule.fetch(new Request('BACKEND_URL/image', {
+            await this.internetModule.fetch(new Request('http://10.37.127.253:8000/image', {
                 method: 'POST',
                 headers: { "Content-Type": "application/json" },
                 body
@@ -125,7 +125,7 @@ let AudioVideo = class AudioVideo extends BaseScriptComponent {
                 frames: framesCopy,
                 audio: audioBase64,
             });
-            await this.internetModule.fetch(new Request('BACKEND_URL/video', {
+            await this.internetModule.fetch(new Request('http://10.37.127.253:8000/video', {
                 method: 'POST',
                 headers: { "Content-Type": "application/json" },
                 body
@@ -181,7 +181,7 @@ let AudioVideo = class AudioVideo extends BaseScriptComponent {
         this.frameCounter = 0;
         this.accumulatedAudio = new Float32Array(0);
         this.accumulatedFrames = [];
-        this.videoBufferSize = 10;
+        this.videoBufferSize = 100;
         this.videoFrameBuffer = [];
         this.audioFrameBuffer = [];
         this.isSending = false;

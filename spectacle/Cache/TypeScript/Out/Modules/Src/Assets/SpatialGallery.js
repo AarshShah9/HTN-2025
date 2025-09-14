@@ -6,38 +6,25 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SpatialGallery = void 0;
+exports.SpatialGalleryBLE = void 0;
 var __selfType = requireType("./SpatialGallery");
 function component(target) { target.getTypeName = function () { return __selfType; }; }
+const GameController_1 = require("GameController.lspkg/GameController");
 /**
- * Provides a somewhat complex example of use of the spatial image components.
+ * Gallery controlled via BLE game controller analog stick.
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
-let SpatialGallery = class SpatialGallery extends BaseScriptComponent {
+let SpatialGalleryBLE = class SpatialGalleryBLE extends BaseScriptComponent {
     onAwake() {
-        if (this.shuffle) {
+        if (this.shuffle)
             shuffle(this.gallery);
-        }
         this.createEvent("OnStartEvent").bind(() => {
             this.initialiseFrame();
         });
-    }
-    /**
-     * Moves the gallery to the next image.
-     */
-    leftPressed() {
-        let newIndex = this.index - 1;
-        if (newIndex < 0) {
-            newIndex += this.gallery.length;
-        }
-        this.setIndex(newIndex);
-    }
-    /**
-     * Move the gallery to the previous image.
-     */
-    rightPressed() {
-        this.setIndex((this.index + 1) % this.gallery.length);
+        // Setup BLE controller
+        this.gameController.scanForControllers();
+        this.createEvent("UpdateEvent").bind(this.onUpdate.bind(this));
     }
     initialiseFrame() {
         this.setIndex(this.index);
@@ -49,6 +36,37 @@ let SpatialGallery = class SpatialGallery extends BaseScriptComponent {
             this.loadingIndicator.sceneObject.enabled = false;
         });
     }
+    onUpdate() {
+        const buttonState = this.gameController.getButtonState();
+        if (!buttonState)
+            return;
+        const lx = buttonState.lx;
+        const dt = getDeltaTime();
+        this.timeSinceLastScroll += dt;
+        // Only scroll if joystick is held past threshold
+        if (Math.abs(lx) > this.scrollThreshold) {
+            if (this.timeSinceLastScroll >= this.scrollInterval) {
+                if (lx > 0)
+                    this.rightPressed();
+                else
+                    this.leftPressed();
+                this.timeSinceLastScroll = 0;
+            }
+        }
+        else {
+            // Reset accumulator when stick is released
+            this.timeSinceLastScroll = this.scrollInterval;
+        }
+    }
+    leftPressed() {
+        let newIndex = this.index - 1;
+        if (newIndex < 0)
+            newIndex += this.gallery.length;
+        this.setIndex(newIndex);
+    }
+    rightPressed() {
+        this.setIndex((this.index + 1) % this.gallery.length);
+    }
     setIndex(newIndex) {
         this.index = newIndex;
         this.frame.setImage(this.gallery[this.index], true);
@@ -56,13 +74,17 @@ let SpatialGallery = class SpatialGallery extends BaseScriptComponent {
     __initialize() {
         super.__initialize();
         this.index = 0;
+        this.gameController = GameController_1.GameController.getInstance();
+        this.scrollThreshold = 0.3;
+        this.scrollInterval = 0.00;
+        this.timeSinceLastScroll = 0;
     }
 };
-exports.SpatialGallery = SpatialGallery;
-exports.SpatialGallery = SpatialGallery = __decorate([
+exports.SpatialGalleryBLE = SpatialGalleryBLE;
+exports.SpatialGalleryBLE = SpatialGalleryBLE = __decorate([
     component
-], SpatialGallery);
-// declare the function
+], SpatialGalleryBLE);
+// Shuffle utility
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));

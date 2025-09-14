@@ -3123,7 +3123,7 @@
   Pivot: {x: 0.000000, y: 0.000000}
   Transform:
     position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    rotation: {x: 0.000000, y: 45.000000, z: 0.000000}
     scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     hasSegmentScaleCompensation: false
   RawMode: true
@@ -5116,7 +5116,7 @@
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 45.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
   Children:
@@ -5898,6 +5898,21 @@
   ScriptTypes:
     "":
       {}
+- !<SceneObject/6ef90040-03f8-4972-8d44-b4eb0b69c401>
+  PrefabRemaps:
+    []
+  Name: Object 0
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    []
 - !<ScriptComponent/6f25c103-f7d4-4dc4-8a22-a8666b62c2f9>
   PrefabRemaps:
     []
@@ -9619,9 +9634,9 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: -50.000000}
+    Position: {x: 30.000000, y: 0.000000, z: -50.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 16.000000, y: 16.000000, z: 1.000000}
+    Scale: {x: 30.000000, y: 30.000002, z: 1.875000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -11270,7 +11285,7 @@
     - c139ef9a-65a5-48b0-b2ef-412fefa31bc4: 58e369c6-44cd-41e8-ae46-0576fabb126e
     - de2183f6-20a7-432a-8912-5d1b753a5dd1: a9b4b869-f2b1-42ef-82a1-2de56cad16d7
   Name: SikSpatialImageFrame
-  Enabled: false
+  Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000000, y: 0.000000, z: -200.000000}
@@ -11709,7 +11724,7 @@
     - ff453b24-d028-4700-9dcf-d2c6a1879c23: bfd438e1-9106-4efb-8dd2-10b956bd65dc
     - ffc937d6-1f94-4c19-ab4a-611f02b6b102: cb4ec7e0-5100-43d4-aad9-ec69d9877e3b
   Name: SpatialGallery
-  Enabled: false
+  Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000000, y: -30.000000, z: -200.000000}
@@ -11718,6 +11733,7 @@
     HasSegmentScaleCompensation: false
   Children:
     - !<own> a2d9b7a4-4775-463d-a225-a0caeb72b581
+    - !<own> 6ef90040-03f8-4972-8d44-b4eb0b69c401
   Components:
     - !<own> ff453b24-d028-4700-9dcf-d2c6a1879c23
 - !<SceneObject/e34c2eaf-0439-40c6-b866-50c7b8f025e2>
