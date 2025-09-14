@@ -7,7 +7,7 @@ A sophisticated image management and memory preservation application that combin
 This application allows users to:
 - Upload and manage image collections
 - Automatically generate AI-powered tags and descriptions for images
-- Search images using natural language queries
+- Search images using natural language queries with AI-powered semantic search
 - View image locations on interactive maps
 - Transcribe audio recordings for memory context
 - Generate embeddings for semantic image search

@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { MemoryImage } from '../lib/types';
+import { searchMemoriesByTranscript } from '../utils/searchMemories';
 
 export type SortOrder = 'asc' | 'desc';
 export type UseMemorySearchResult = {
@@ -15,12 +16,57 @@ export type UseMemorySearchResult = {
   totalTags: number;
   totalLocations: number;
   availableTags: string[];
+  isSemanticSearching: boolean;
+  semanticSearchError: string | null;
 };
 
 export const useMemorySearch = (memories: MemoryImage[]): UseMemorySearchResult => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [semanticResults, setSemanticResults] = useState<MemoryImage[]>([]);
+  const [isSemanticSearching, setIsSemanticSearching] = useState(false);
+  const [semanticSearchError, setSemanticSearchError] = useState<string | null>(null);
+
+  // Debounced semantic search effect
+  useEffect(() => {
+    const performSemanticSearch = async (term: string) => {
+      if (!term.trim()) {
+        setSemanticResults([]);
+        setSemanticSearchError(null);
+        return;
+      }
+
+      setIsSemanticSearching(true);
+      setSemanticSearchError(null);
+
+      try {
+        const results = await searchMemoriesByTranscript(term, 50);
+        setSemanticResults(results);
+      } catch (error) {
+        console.error('Semantic search failed:', error);
+        setSemanticSearchError('Search failed. Using local results instead.');
+        setSemanticResults([]);
+      } finally {
+        setIsSemanticSearching(false);
+      }
+    };
+
+    // Debounce the search to avoid too many API calls
+    const timeoutId = setTimeout(() => {
+      performSemanticSearch(searchTerm);
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  // Reset semantic search when search term is cleared
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setSemanticResults([]);
+      setSemanticSearchError(null);
+    }
+  }, [searchTerm]);
 
   // Calculate stats
   const totalTags = useMemo(() => {
@@ -50,19 +96,27 @@ export const useMemorySearch = (memories: MemoryImage[]): UseMemorySearchResult 
   }, [memories]);
 
   const filteredMemories = useMemo(() => {
-    let filtered = memories;
-
-    // Apply text search
-    if (searchTerm.trim()) {
+    // Determine which dataset to use as the base
+    let baseMemories: MemoryImage[];
+    
+    if (searchTerm.trim() && semanticResults.length > 0) {
+      // Use semantic search results when available
+      baseMemories = semanticResults;
+    } else if (searchTerm.trim()) {
+      // Fallback to client-side text search if semantic search failed or returned no results
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter((memory) =>
+      baseMemories = memories.filter((memory) =>
         memory.description?.toLowerCase().includes(term) ||
         memory.tags.some(tag => tag.toLowerCase().includes(term)) ||
         (memory.location && memory.location.toLowerCase().includes(term))
-      )
+      );
+    } else {
+      // No search term - use all memories
+      baseMemories = memories;
     }
 
-    // Apply tag filtering
+    // Apply tag filtering to the base dataset
+    let filtered = baseMemories;
     if (selectedTags.length > 0) {
       filtered = filtered.filter((memory) =>
         selectedTags.some(selectedTag =>
@@ -81,7 +135,7 @@ export const useMemorySearch = (memories: MemoryImage[]): UseMemorySearchResult 
     });
 
     return filtered;
-  }, [memories, searchTerm, selectedTags, sortOrder]);
+  }, [memories, searchTerm, selectedTags, sortOrder, semanticResults]);
 
   return {
     searchTerm,
@@ -96,5 +150,7 @@ export const useMemorySearch = (memories: MemoryImage[]): UseMemorySearchResult 
     totalTags,
     totalLocations,
     availableTags,
+    isSemanticSearching,
+    semanticSearchError,
   };
 };

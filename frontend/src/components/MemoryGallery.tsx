@@ -16,7 +16,9 @@ const MemoryGallery: React.FC = () => {
     filteredCount,
     totalTags,
     totalLocations,
-    availableTags
+    availableTags,
+    isSemanticSearching,
+    semanticSearchError
   } = useMemorySearch(memories);
 
   const handleSearchChange = (term: string) => {
@@ -75,6 +77,8 @@ const MemoryGallery: React.FC = () => {
               sortOrder={sortOrder}
               onSortChange={handleSortChange}
               availableTags={availableTags}
+              isSemanticSearching={isSemanticSearching}
+              semanticSearchError={semanticSearchError}
             />
 
             <MemoryStats

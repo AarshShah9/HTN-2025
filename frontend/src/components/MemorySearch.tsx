@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowDown, ArrowUp, Filter, Search, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, Filter, Search, X, Loader2, AlertCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import type { SortOrder } from '../hooks/useMemorySearch';
 
@@ -15,6 +15,8 @@ type MemorySearchProps = {
   onSortChange: (order: SortOrder) => void;
   availableTags: string[];
   placeholder?: string;
+  isSemanticSearching?: boolean;
+  semanticSearchError?: string | null;
 };
 
 const MemorySearch: React.FC<MemorySearchProps> = ({
@@ -26,7 +28,9 @@ const MemorySearch: React.FC<MemorySearchProps> = ({
   sortOrder,
   onSortChange,
   availableTags,
-  placeholder = "Search memories..."
+  placeholder = "Search memories...",
+  isSemanticSearching = false,
+  semanticSearchError = null
 }) => {
   const [showTagFilter, setShowTagFilter] = useState(false);
 
@@ -45,23 +49,52 @@ const MemorySearch: React.FC<MemorySearchProps> = ({
   return (
     <div className="max-w-4xl mx-auto mb-8 space-y-4">
       {/* Search Input */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-        <Input
-          type="text"
-          placeholder={placeholder}
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10 pr-10"
-        />
-        {searchTerm && (
-          <button
-            onClick={handleClear}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Clear search"
-          >
-            <X className="w-4 h-4" />
-          </button>
+      <div className="space-y-2">
+        <div className="relative">
+          {isSemanticSearching ? (
+            <Loader2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4 animate-spin" />
+          ) : (
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          )}
+          <Input
+            type="text"
+            placeholder={placeholder}
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-10 pr-10"
+          />
+          {searchTerm && (
+            <button
+              onClick={handleClear}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Clear search"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        
+        {/* Search Status Indicators */}
+        {searchTerm.trim() && (
+          <div className="flex items-center gap-2 text-sm">
+            {isSemanticSearching && (
+              <span className="text-primary flex items-center gap-1">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Searching with AI...
+              </span>
+            )}
+            {semanticSearchError && (
+              <span className="text-orange-600 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
+                {semanticSearchError}
+              </span>
+            )}
+            {!isSemanticSearching && !semanticSearchError && searchTerm.trim() && (
+              <span className="text-green-600 text-xs">
+                🧠 AI-powered semantic search
+              </span>
+            )}
+          </div>
         )}
       </div>
 
