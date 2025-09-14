@@ -84,5 +84,6 @@ class VideoResponse(VideoBase):
     id: str  # UUID stored as string
     frames: List[str]
     timestamp: datetime
+    transcript: Optional[str] = Field(default=None, description="Audio transcription text")
 
     model_config = ConfigDict(from_attributes=True)

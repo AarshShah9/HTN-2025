@@ -177,6 +177,8 @@ class VideoRepository:
         fps: Optional[float] = None,
         duration: Optional[float] = None,
         audio: Optional[str] = None,
+        latitude: Optional[float] = None,
+        longitude: Optional[float] = None,
     ) -> Optional[VideoModel]:
         """Update a video record."""
         id_str = str(video_id) if isinstance(video_id, UUID) else video_id
@@ -196,6 +198,10 @@ class VideoRepository:
             update_data[VideoModel.duration] = duration
         if audio is not None:
             update_data[VideoModel.audio] = audio
+        if latitude is not None:
+            update_data[VideoModel.latitude] = latitude
+        if longitude is not None:
+            update_data[VideoModel.longitude] = longitude
 
         if not update_data:
             return await self.get_video_by_id(video_id)

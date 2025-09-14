@@ -65,6 +65,9 @@ async def create_tables():
     Uses SQLAlchemy metadata to create all tables defined by models
     that inherit from the Base class.
     """
+    # Import models to ensure they're registered with Base.metadata
+    from database.models import ImageModel, VideoModel, AudioModel
+    
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 

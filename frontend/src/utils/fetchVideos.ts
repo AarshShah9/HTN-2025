@@ -18,6 +18,7 @@ interface BackendVideoResponse {
   fps: number;
   duration: number;
   audio_id: string | null;
+  transcript: string | null;
   latitude: number | null;
   longitude: number | null;
 }
@@ -38,9 +39,6 @@ export const fetchVideos = async (): Promise<VideosData> => {
 
     const backendVideos: BackendVideoResponse[] = await response.json();
 
-    // Skip audio fetching since /audio endpoint doesn't exist
-    // Videos will play without audio transcription
-
     // Map backend response to frontend types
     const videos: MemoryVideo[] = backendVideos.map((video) => {
       return {
@@ -57,7 +55,7 @@ export const fetchVideos = async (): Promise<VideosData> => {
         fps: video.fps,
         duration: video.duration,
         audio_id: video.audio_id || undefined,
-        transcription: undefined, // No audio transcription available
+        transcription: video.transcript || undefined,
       };
     });
 

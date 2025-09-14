@@ -63,7 +63,7 @@ app = FastAPI(
     title="HTN 2025 - AI-Powered Memory Gallery",
     description="A sophisticated image management system with AI-powered tagging and search",
     version="1.0.0",
-    # lifespan=lifespan,
+    lifespan=lifespan,
     debug=True
 )
 

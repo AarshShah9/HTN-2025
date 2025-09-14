@@ -9,6 +9,7 @@ from app.models.models import VideoCreate, VideoResponse
 from app.repository.audio_repository import AudioRepository
 from app.repository.video_repository import VideoRepository
 from app.utils.transcription import transcribe_audio_from_bytes
+from database.models import VideoModel
 
 router = APIRouter(prefix="/video", tags=["videos"])
 
@@ -23,6 +24,34 @@ def get_audio_repository(
     session: AsyncSession = Depends(get_db_session),
 ) -> AudioRepository:
     return AudioRepository(session)
+
+
+async def build_video_response(
+    video: VideoModel, audio_repo: AudioRepository
+) -> VideoResponse:
+    """Build a VideoResponse with transcript included from AudioModel."""
+    transcript = None
+    if video.audio_id:
+        audio = await audio_repo.get_audio_by_id(video.audio_id)
+        if audio:
+            transcript = audio.transcription
+    
+    # Create response dict from video model
+    video_dict = {
+        "id": video.id,
+        "timestamp": video.timestamp,
+        "tagged": video.tagged,
+        "frames": video.frames,
+        "tags": video.tags,
+        "fps": video.fps,
+        "duration": video.duration,
+        "audio_id": video.audio_id,
+        "latitude": video.latitude,
+        "longitude": video.longitude,
+        "transcript": transcript,
+    }
+    
+    return VideoResponse(**video_dict)
 
 
 @router.post("/", response_model=VideoResponse, status_code=status.HTTP_201_CREATED)
@@ -63,7 +92,7 @@ async def create_video(
             latitude=video_data.latitude,
             longitude=video_data.longitude,
         )
-        return VideoResponse.model_validate(video)
+        return await build_video_response(video, audio_repo)
     except Exception as e:
         print(e)
         raise HTTPException(
@@ -74,7 +103,9 @@ async def create_video(
 
 @router.get("/{video_id}", response_model=VideoResponse)
 async def get_video(
-    video_id: str, repository: VideoRepository = Depends(get_video_repository)
+    video_id: str, 
+    repository: VideoRepository = Depends(get_video_repository),
+    audio_repo: AudioRepository = Depends(get_audio_repository),
 ):
     """Get a video by ID."""
     video = await repository.get_video_by_id(video_id)
@@ -82,7 +113,7 @@ async def get_video(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Video not found"
         )
-    return VideoResponse.model_validate(video)
+    return await build_video_response(video, audio_repo)
 
 
 @router.get("/", response_model=List[VideoResponse])
@@ -91,6 +122,7 @@ async def get_videos(
     limit: int = 100,
     tagged_only: Optional[bool] = None,
     repository: VideoRepository = Depends(get_video_repository),
+    audio_repo: AudioRepository = Depends(get_audio_repository),
 ):
     """Get all videos with optional filtering."""
     if tagged_only is True:
@@ -100,7 +132,7 @@ async def get_videos(
     else:
         videos = await repository.get_all_videos(skip=skip, limit=limit)
 
-    return [VideoResponse.model_validate(video) for video in videos]
+    return [await build_video_response(video, audio_repo) for video in videos]
 
 
 @router.get("/search/by-tags", response_model=List[VideoResponse])
@@ -109,6 +141,7 @@ async def search_videos_by_tags(
     skip: int = 0,
     limit: int = 100,
     repository: VideoRepository = Depends(get_video_repository),
+    audio_repo: AudioRepository = Depends(get_audio_repository),
 ):
     """Search videos by tags."""
     tag_list = [tag.strip() for tag in tags.split(",") if tag.strip()]
@@ -119,7 +152,7 @@ async def search_videos_by_tags(
         )
 
     videos = await repository.search_videos_by_tags(tag_list, skip=skip, limit=limit)
-    return [VideoResponse.model_validate(video) for video in videos]
+    return [await build_video_response(video, audio_repo) for video in videos]
 
 
 @router.delete("/{video_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -179,7 +212,7 @@ async def get_videos_by_embedding(
             if video:
                 videos.append(video)
 
-        return [VideoResponse.model_validate(video) for video in videos]
+        return [await build_video_response(video, audio_repo) for video in videos]
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

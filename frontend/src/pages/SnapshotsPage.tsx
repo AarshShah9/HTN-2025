@@ -364,9 +364,16 @@ const DetailModal: React.FC<DetailModalProps> = ({ item, onClose }) => {
               
               {isVideo(item) && item.transcription && (
                 <div>
-                  <h3 className="font-semibold text-gray-700 mb-2">Audio Transcript</h3>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-gray-700 text-sm">{item.transcription}</p>
+                  <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                    Audio Transcript
+                  </h3>
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400 rounded-lg overflow-hidden">
+                    <div className="max-h-[30vh] overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                      <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">{item.transcription.trim()}</p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -540,6 +547,28 @@ const ConcatenatedVideoPlayer: React.FC<ConcatenatedVideoPlayerProps> = ({ video
           </div>
         </div>
       </div>
+
+      {/* Current Video Transcript */}
+      {currentVideo && currentVideo.transcription && (
+        <div className="p-6 bg-gradient-to-r from-purple-50 to-blue-50 border-t border-gray-200">
+          <div className="flex items-center gap-2 mb-3">
+            <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+            <h3 className="font-semibold text-gray-800">Current Video Transcript</h3>
+            <span className="text-sm text-gray-500">
+              (Video {currentFrame.videoIndex + 1} of {videos.length})
+            </span>
+          </div>
+          <div className="bg-white border border-purple-200 rounded-lg overflow-hidden">
+            <div className="max-h-32 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-purple-100">
+              <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+                {currentVideo.transcription.trim()}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

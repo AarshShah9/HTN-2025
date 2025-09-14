@@ -123,9 +123,9 @@ class ChatAgent:
         
         # Add detailed information for every 10th image to reduce context size
         for i, image in enumerate(all_images, 1):
-            if i % 10 != 0:  # Skip to every 10th image
+            if i % 2 != 0:  # Skip to every 10th image
                 continue
-            image_info = [f"IMAGE #{i} (ID: {image.id}):"]
+            image_info = [f"IMAGE #{i}:"]
             
             # Add timestamp first for chronological context
             if image.timestamp:
@@ -165,9 +165,8 @@ class ChatAgent:
         
         # Add detailed information for every 10th video to reduce context size
         for i, video in enumerate(all_videos, 1):
-            if i % 10 != 0:  # Skip to every 10th video
+            if i % 2 != 0:  # Skip to every 10th video
                 continue
-            video_info = [f"VIDEO #{i} (ID: {video.id}):"]
             
             # Add timestamp first for chronological context
             if video.timestamp:

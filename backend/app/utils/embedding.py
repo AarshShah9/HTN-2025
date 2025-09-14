@@ -3,6 +3,10 @@ from typing import List, Optional
 
 from google import genai
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 def generate_text_embedding(text: str) -> Optional[List[float]]:
     """Generate text embeddings using Google Gemini.

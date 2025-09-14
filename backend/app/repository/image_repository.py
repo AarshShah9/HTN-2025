@@ -315,6 +315,8 @@ class ImageRepository:
         embeddings: Optional[dict] = None,
         tagged: Optional[bool] = None,
         audio_id: Optional[str] = None,
+        latitude: Optional[float] = None,
+        longitude: Optional[float] = None,
     ) -> Optional[ImageModel]:
         """Update an image record."""
         id_str = str(image_id) if isinstance(image_id, UUID) else image_id
@@ -330,6 +332,10 @@ class ImageRepository:
             update_data["tagged"] = tagged
         if audio_id is not None:
             update_data[ImageModel.audio_id] = audio_id
+        if latitude is not None:
+            update_data["latitude"] = latitude
+        if longitude is not None:
+            update_data["longitude"] = longitude
 
         if not update_data:
             return await self.get_image_by_id(image_id)

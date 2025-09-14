@@ -84,7 +84,7 @@ async def upload_image(
 
 
     try:
-
+        print("long lat:",data.longitude, data.latitude)
         transcription = data.transcript
 
         audio_record = await audio_repository.create_audio(transcription=transcription)
