@@ -7,13 +7,16 @@ import prisma from "./prisma/client";
 import { schedule } from "node-cron";
 import videoRouter from "./routes/video.router";
 import imageRouter from "./routes/image.router";
+import { getImageTagsBatchAsParts } from "./util/tagging";
+import dotenv from "dotenv";
 
+dotenv.config();
 const app = express();
 const dev = process.env.NODE_ENV === "dev";
 
-// Run the cron worker every day every hour
-schedule("0 * * * *", async () => {
+schedule("*/15 * * * * *", async () => {
   try {
+    await getImageTagsBatchAsParts([], 20);
   } catch (error) {
     console.error("Failed to run cron job -- generic error", error);
   }
@@ -30,7 +33,7 @@ app.use(
     allowedHeaders: [
       "Content-Type",
       "Authorization",
-      "ngrok-skip-browser-warning"
+      "ngrok-skip-browser-warning",
     ],
   }),
 );
@@ -55,52 +58,52 @@ app.get("/health-check", (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json({ message: "OK" });
 });
 
-
 // server start
 const server = app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
 
-
 // Handle uncaught exceptions
-process.on('uncaughtException', (err) => {
-  console.error('UNCAUGHT EXCEPTION!');
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION!");
   console.error(err.name, err.message);
-  console.error('Stack:', err.stack);
+  console.error("Stack:", err.stack);
   // Continue running the server instead of crashing
 });
 
 // Handle unhandled promise rejections
-process.on('unhandledRejection', (err: Error) => {
-  console.error('UNHANDLED REJECTION!');
+process.on("unhandledRejection", (err: Error) => {
+  console.error("UNHANDLED REJECTION!");
   console.error(err.name, err.message);
-  console.error('Stack:', err.stack);
+  console.error("Stack:", err.stack);
   // Continue running the server instead of crashing
 });
 
 // Graceful shutdown
 const gracefulShutdown = () => {
-  console.log('\nGracefully shutting down...');
+  console.log("\nGracefully shutting down...");
   server.close(async () => {
     try {
       await prisma.$disconnect();
-      console.log('Prisma client disconnected');
+      console.log("Prisma client disconnected");
       process.exit(0);
     } catch (err) {
-      console.error('Error during shutdown:', err);
+      console.error("Error during shutdown:", err);
       process.exit(1);
     }
   });
 
   // Force shutdown after 10 seconds
   setTimeout(() => {
-    console.error('Could not close connections in time, forcefully shutting down');
+    console.error(
+      "Could not close connections in time, forcefully shutting down",
+    );
     process.exit(1);
   }, 10000);
 };
 
-process.on('SIGTERM', gracefulShutdown);
-process.on('SIGINT', gracefulShutdown);
+process.on("SIGTERM", gracefulShutdown);
+process.on("SIGINT", gracefulShutdown);
 
 export default app;
 export { server };
