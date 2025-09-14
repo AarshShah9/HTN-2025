@@ -9,7 +9,7 @@ import {
 const router = Router();
 
 router.get("/", getVideos);
-router.post("/upload", uploadVideoAndAudio);
+router.post("", uploadVideoAndAudio);
 router.get("/by-transcription", getVideosByTranscription);
 
 export default router;

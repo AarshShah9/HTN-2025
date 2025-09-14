@@ -38,9 +38,10 @@ app.use(
   }),
 );
 
-app.use(express.json()); // parsing JSON in the request body
+// Increase payload size limits for large video/image uploads
+app.use(express.json({ limit: '1000mb' })); // parsing JSON in the request body
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true })); // parsing URL-encoded form data
+app.use(express.urlencoded({ extended: true, limit: '1000mb' })); // parsing URL-encoded form data
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.header("Content-Type", "application/json");
   res.header("Access-Control-Allow-Origin", "*");
@@ -59,8 +60,14 @@ app.get("/health-check", (req: Request, res: Response, next: NextFunction) => {
 });
 
 // server start
-const server = app.listen(port, () => {
-  console.log(`App listening at http://localhost:${port}`);
+// const server = app.listen(port, () => {
+//   console.log(`App listening at http://localhost:${port}`);
+// });
+
+const PORT = 8080;
+const HOST = "0.0.0.0";
+const server = app.listen(PORT, HOST, () => {
+    console.log(`Server running at http://${HOST}:${PORT}`);
 });
 
 // Handle uncaught exceptions
