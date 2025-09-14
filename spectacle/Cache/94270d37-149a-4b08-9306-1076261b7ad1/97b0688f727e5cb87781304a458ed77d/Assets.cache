@@ -1,0 +1,13 @@
+- !<AssetCache>
+  AssetFiles:
+    3a94f6ee-5750-4fe4-be9f-a54cdc2b3225: 94270d37-149a-4b08-9306-1076261b7ad1/97b0688f727e5cb87781304a458ed77d/Data/-_- snorlax.webp
+  Assets:
+    - !<FileTexture/3a94f6ee-5750-4fe4-be9f-a54cdc2b3225>
+      PackagePath: ""
+      FileInfo: !<FileTextureInfo>
+        Width: 640
+        Height: 678
+  SourceHash: 97b0688f727e5cb87781304a458ed77d
+  FileHash: 2608479c45a7f6b663ab3a6c4419925b
+  NativePackageItems:
+    []

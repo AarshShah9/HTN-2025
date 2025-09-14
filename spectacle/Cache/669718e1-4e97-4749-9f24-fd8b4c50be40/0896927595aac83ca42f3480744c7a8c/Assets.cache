@@ -1,0 +1,10 @@
+- !<AssetCache>
+  AssetFiles:
+    312a4dc7-443c-40d1-b140-e19e7766fece: 669718e1-4e97-4749-9f24-fd8b4c50be40/0896927595aac83ca42f3480744c7a8c/Data/package_dependencies.json
+  Assets:
+    - !<JsonAsset/312a4dc7-443c-40d1-b140-e19e7766fece>
+      PackagePath: ""
+  SourceHash: 0896927595aac83ca42f3480744c7a8c
+  FileHash: 8604ca484396179ca4f4e86254ce49ef
+  NativePackageItems:
+    []

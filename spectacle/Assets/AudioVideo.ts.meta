@@ -1,0 +1,44 @@
+- !<AssetImportMetadata/dbaec0cc-613d-4bc1-a2b2-1a98299e20a9>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> a79bc800-9322-4a30-a883-c5c5350896c4
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> a79bc800-9322-4a30-a883-c5c5350896c4
+  PackageType: NotAPackage
+  PackagePolicy: CannotBeUnpacked
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 5e697c2a-a34f-444b-b3b9-93190e926a6d
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/5e697c2a-a34f-444b-b3b9-93190e926a6d>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: aa6e908c-70e8-440c-b830-5ea0d566222b
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  CurrentVisibility: Editable
+  MaxVisibility: Editable
+  ScriptInputsHidden:
+    internetModule: false
+    microphoneAsset: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  DefaultScriptInputs:
+    - internetModule: !<reference.InternetModule> 00000000-0000-0000-0000-000000000000
+      microphoneAsset: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input Asset.InternetModule internetModule
+    - // @input Asset.AudioTrackAsset microphoneAsset

@@ -1,0 +1,30 @@
+- !<NativePackageDescriptor/911688cb-7af1-47a6-84ec-aa17aa880bb9>
+  PackagePath: ""
+  StudioVersion:
+    major: 5
+    minor: 12
+    patch: 1
+    build: 25080420
+    type: Unset
+  Description: "# SpatialImageComponent\n\nSpatial Image Component is a custom component that spatializes a 2D image texture, turning it into a 3D mesh to be viewed on Spectacles.\n\n## API\n\n### Properties\n\n#### frameHeight: number\n\nThe height of the spatialized image in AR space.\n\n#### frameOffset: number\n\nThe frameOffset, the focal point of the image.\n\n#### depthScale: number\n\nThe depthScale of the image, which reflects how deep the image appears.\n\n#### fadeBorder: boolean\n\nIf the border of the image should be faded.\n\n#### frameOn: boolean\n\nEnables and disables the image frame with rounded corners, that creates the viewing portal effect. _Note: if fadeBorder is applied, this will fade the frame border too and will also make the image appear in a frame_\n\n#### onLoaded: EventWrapper (readonly)\n\nAn Event triggered when the image has been successfully spatialized and returned. Use `onLoaded .add(callback)` and `onLoaded .remove(callback)`.\n\n#### onLoadingStart: EventWrapper (readonly)\n\nA Event triggered when the image loading begins - when it's added to the queue to start spatializing. In the callback, checkSpatializing is a function that returns a boolean determining whether the image is currently spatializing or if it's still in the queue/rejected. Use `onLoadingStart .add(callback)` and `onLoadingStart .remove(callback)`.\n\n### Methods\n\n#### setImage(image: Texture): void\n\nRequests the image to be spatialized and updates the mesh when this returns.\n\n#### getImageTexture(): Texture | undefined\n\nIf present, returns the flat texture that is or is being spatialized.\n\n#### getLoadStatus(): LoadStatus\n\nReturns if the image is in the process of being spatialized or if this has been completed.\n\n#### setMaterialProperties(height: number, offset: number, scale: number): void\n\nAllows for all the material properties to be set in a single call.\n\n#### setFrameOffset(offset: number): void\n\nSets the frameOffset, the focal point of the image. Added for use with scene sliders.\n\n#### setDepthScale(scale: number): void\n\nSets the depthScale of the image, which reflects how deep the image appears. Added for use with scene sliders.\n\n## Troubleshooting\n\n### The spatial image's background is cut off\n\nTry increasing the far clipping plane of the camera.\n\n### The spatial image doesn't show up in the lens studio preview\n\nMake sure the preview device is set to Spectacles and check internet connection.\n"
+  SvgIcon: "<svg width=\"234\" height=\"212\" viewBox=\"0 0 234 212\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M55.3619 38.4378L11.4999 62.8613C4.38411 66.8235 4.55389 78.7239 11.7787 82.4069L113.738 134.383C116.083 135.578 118.749 135.578 121.094 134.383L223.053 82.4069C230.278 78.7239 230.448 66.8235 223.332 62.8613L121.373 6.08782C118.87 4.69412 115.962 4.69412 113.459 6.08782L86.3889 21.1612\" stroke=\"white\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n<path d=\"M179.162 73.767L121.064 41.417C118.562 40.0233 115.654 40.0233 113.151 41.417L55.0538 73.767M210.189 91.0436L223.024 98.1905C230.139 102.153 229.97 114.053 222.745 117.736L120.786 169.712C118.44 170.907 115.775 170.907 113.43 169.712L70.5673 147.862M24.0268 91.0436L11.1918 98.1905C4.07601 102.153 4.24578 114.053 11.4706 117.736L55.0538 139.953\" stroke=\"white\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n<path d=\"M148.135 92.1792L121.064 77.1058C118.562 75.7121 115.654 75.7121 113.151 77.1058L86.0808 92.1792M210.189 126.732L223.024 133.879C230.139 137.841 229.97 149.742 222.745 153.425L194.675 167.734M24.0268 126.732L11.1918 133.879C4.076 137.841 4.24579 149.742 11.4706 153.425L113.43 205.401C115.775 206.596 118.44 206.596 120.786 205.401L179.162 175.642\" stroke=\"white\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>\n"
+  VersionMajor: 1
+  VersionMinor: 0
+  VersionPatch: 1
+  UpdateCheckpoint: 68
+  ExportUid: 204f14fe-751b-4df8-8d01-408e4657005a
+  ComponentUid: d26401c9-9f79-402e-98e6-e491cc34d6d5
+  CurrentVisibility: Locked
+  MaxVisibility: Locked
+  Instantiable: !<reference> 0befc8a4-0849-4e52-8f02-ac717484d5db
+  AssetLibraryDependencyStructure: !<AssetLibraryDependencyStructure/00000000-0000-0000-0000-000000000000>
+    Name: Spatial Image
+    AssetId: 4eoJ2AZG5s172r1elvuFIj
+    Hash: 32b6aa02f1968557301931355fdc9a3a
+    Version:
+      major: 1
+      minor: 0
+      patch: 1
+      build: 0
+  coreVersion: 321
+  clientVersion: 13.5

@@ -1,0 +1,87 @@
+//SG_REFLECTION_BEGIN(200)
+//attribute vec4 position 0
+//attribute vec3 normal 1
+//attribute vec4 tangent 2
+//attribute vec2 texture0 3
+//attribute vec2 texture1 4
+//attribute vec4 color 5
+//sampler sampler intensityTextureSmpSC 0:21
+//sampler sampler renderTarget0SmpSC 0:22
+//sampler sampler renderTarget1SmpSC 0:23
+//sampler sampler renderTarget2SmpSC 0:24
+//sampler sampler renderTarget3SmpSC 0:25
+//sampler sampler sc_ScreenTextureSmpSC 0:30
+//texture texture2D intensityTexture 0:0:0:21
+//texture texture2D renderTarget0 0:1:0:22
+//texture texture2D renderTarget1 0:2:0:23
+//texture texture2D renderTarget2 0:3:0:24
+//texture texture2D renderTarget3 0:4:0:25
+//texture texture2D sc_ScreenTexture 0:16:0:30
+//texture texture2DArray intensityTextureArrSC 0:35:0:21
+//texture texture2DArray renderTarget0ArrSC 0:36:0:22
+//texture texture2DArray renderTarget1ArrSC 0:37:0:23
+//texture texture2DArray renderTarget2ArrSC 0:38:0:24
+//texture texture2DArray renderTarget3ArrSC 0:39:0:25
+//texture texture2DArray sc_ScreenTextureArrSC 0:42:0:30
+//spec_const bool BLEND_MODE_AVERAGE 0 0
+//spec_const bool BLEND_MODE_BRIGHT 1 0
+//spec_const bool BLEND_MODE_COLOR 2 0
+//spec_const bool BLEND_MODE_COLOR_BURN 3 0
+//spec_const bool BLEND_MODE_COLOR_DODGE 4 0
+//spec_const bool BLEND_MODE_DARKEN 5 0
+//spec_const bool BLEND_MODE_DIFFERENCE 6 0
+//spec_const bool BLEND_MODE_DIVIDE 7 0
+//spec_const bool BLEND_MODE_DIVISION 8 0
+//spec_const bool BLEND_MODE_EXCLUSION 9 0
+//spec_const bool BLEND_MODE_FORGRAY 10 0
+//spec_const bool BLEND_MODE_HARD_GLOW 11 0
+//spec_const bool BLEND_MODE_HARD_LIGHT 12 0
+//spec_const bool BLEND_MODE_HARD_MIX 13 0
+//spec_const bool BLEND_MODE_HARD_PHOENIX 14 0
+//spec_const bool BLEND_MODE_HARD_REFLECT 15 0
+//spec_const bool BLEND_MODE_HUE 16 0
+//spec_const bool BLEND_MODE_INTENSE 17 0
+//spec_const bool BLEND_MODE_LIGHTEN 18 0
+//spec_const bool BLEND_MODE_LINEAR_LIGHT 19 0
+//spec_const bool BLEND_MODE_LUMINOSITY 20 0
+//spec_const bool BLEND_MODE_NEGATION 21 0
+//spec_const bool BLEND_MODE_NOTBRIGHT 22 0
+//spec_const bool BLEND_MODE_OVERLAY 23 0
+//spec_const bool BLEND_MODE_PIN_LIGHT 24 0
+//spec_const bool BLEND_MODE_REALISTIC 25 0
+//spec_const bool BLEND_MODE_SATURATION 26 0
+//spec_const bool BLEND_MODE_SOFT_LIGHT 27 0
+//spec_const bool BLEND_MODE_SUBTRACT 28 0
+//spec_const bool BLEND_MODE_VIVID_LIGHT 29 0
+//spec_const bool SC_USE_CLAMP_TO_BORDER_intensityTexture 30 0
+//spec_const bool SC_USE_UV_MIN_MAX_intensityTexture 31 0
+//spec_const bool SC_USE_UV_TRANSFORM_intensityTexture 32 0
+//spec_const bool intensityTextureHasSwappedViews 33 0
+//spec_const bool renderTarget0HasSwappedViews 34 0
+//spec_const bool renderTarget1HasSwappedViews 35 0
+//spec_const bool renderTarget2HasSwappedViews 36 0
+//spec_const bool renderTarget3HasSwappedViews 37 0
+//spec_const bool sc_BlendMode_Custom 38 0
+//spec_const bool sc_BlendMode_MultiplyOriginal 39 0
+//spec_const bool sc_BlendMode_PremultipliedAlphaAuto 40 0
+//spec_const bool sc_BlendMode_Screen 41 0
+//spec_const bool sc_FramebufferFetch 42 0
+//spec_const bool sc_MotionVectorsPass 43 0
+//spec_const bool sc_OutputBounds 44 0
+//spec_const bool sc_RenderAlphaToColor 45 0
+//spec_const bool sc_ScreenTextureHasSwappedViews 46 0
+//spec_const bool sc_Voxelization 47 0
+//spec_const int SC_SOFTWARE_WRAP_MODE_U_intensityTexture 48 -1
+//spec_const int SC_SOFTWARE_WRAP_MODE_V_intensityTexture 49 -1
+//spec_const int intensityTextureLayout 50 0
+//spec_const int renderTarget0Layout 51 0
+//spec_const int renderTarget1Layout 52 0
+//spec_const int renderTarget2Layout 53 0
+//spec_const int renderTarget3Layout 54 0
+//spec_const int sc_DepthBufferMode 55 0
+//spec_const int sc_ScreenTextureLayout 56 0
+//spec_const int sc_ShaderCacheConstant 57 0
+//spec_const int sc_StereoRenderingMode 58 0
+//spec_const int sc_StereoRendering_IsClipDistanceEnabled 59 0
+//spec_const int sc_StereoViewID 60 0
+//SG_REFLECTION_END

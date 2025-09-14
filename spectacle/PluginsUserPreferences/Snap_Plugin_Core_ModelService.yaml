@@ -1,0 +1,20 @@
+ExternalSources:
+  type: "std::map<class Es::Uuid,class Es::Path,struct std::less<class Es::Uuid>,class std::allocator<struct std::pair<class Es::Uuid const ,class Es::Path> > >"
+  value:
+    - 01732f16-bc67-4b92-b9fb-a9a48f34d391: "C:/Users/daniel/AppData/Local/Snap/Lens Studio/LibraryComponents/Spatial Image.lsc"
+    - 086f9b5a-8ee1-4e42-a06b-c86fb3d423a7: "C:/Users/daniel/AppData/Local/Snap/Lens Studio/LibraryComponents/GameController.lspkg"
+    - 1871d031-9f22-4e3e-a0ca-a77b13395386: "C:/Users/daniel/Downloads/spatial/Assets/SpatialImage/Components/SpatialImageFrame.ts"
+    - 254792ef-577f-486b-8fe0-c5e5675c34e5: "C:/Users/daniel/Downloads/spatial/Assets/SpatialImage/Components/SpatialGallery.ts"
+    - 3aaabf79-27a1-49d9-904a-048b1419bcb1: "C:/Users/daniel/AppData/Local/Snap/Lens Studio/LibraryComponents/Web View.lspkg"
+    - 653af022-b0b2-47de-b70d-cc2bb62d9624: "C:/Users/daniel/Downloads/spatial/Assets/Loader/3D Loading Indicator Resources/Meshes/UI/ui_loading_indicator.mesh"
+    - 7d359363-c481-44e1-b78e-4d556a3f4285: "C:/Users/daniel/Downloads/spatial/Assets/Loader/.hidden/ui_loading [EDIT_ME].ss_graph"
+    - 7f422319-826d-4a0b-8278-63ab49c7d008: "C:/Program Files/Snap Inc/Lens Studio/JsPlugins/PresetsRegistry/Assets/TypeScript/Resources/Untitled TypeScript.ts"
+    - 8456bffb-6802-42bc-a9ac-af74eda3e5ed: "C:/Users/daniel/Downloads/spatial/Assets/SpatialImage/Components/SpatialImageSwapper.ts"
+    - 94270d37-149a-4b08-9306-1076261b7ad1: "C:/Users/daniel/Downloads/sick pics and vids/-_- snorlax.webp"
+    - 9b30483e-6f64-4d59-85d9-fdc320ef73b8: "C:/Users/daniel/Downloads/spatial/Assets/SpatialImage/Components/SpatialImageAngleValidator.ts"
+    - b52e192d-bb10-4406-b018-fae1fbf08600: "C:/Users/daniel/Downloads/spatial/Assets/SpatialImage/Components/SpatialImageDepthAnimator.ts"
+    - e69f290f-aa2a-49d9-834e-3adfc3677862: "C:/Users/daniel/Downloads/spatial/Assets/SpatialImage/UIMaterials/image_unlit.ss_graph"
+    - e6c03a97-b121-4294-8dd9-61c369c91777: "C:/Program Files/Snap Inc/Lens Studio/JsPlugins/PresetsRegistry/Assets/Resources/flat.ss_graph"
+    - f4d8fad1-57aa-4089-a2f0-440fa662e0ef: "C:/Users/daniel/Downloads/sick pics and vids/cat.png"
+    - ffe654e0-4f4c-4448-ba17-b7a8d7c70b39: "C:/Users/daniel/Downloads/spatial/Assets/SpatialImage/Components/LoadingIndicator.ts"
+  options: 4
