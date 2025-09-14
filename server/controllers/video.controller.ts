@@ -50,10 +50,11 @@ export const getVideosByTranscription = async (
     const sortedVideos = videosWithSimilarity.sort(
       (a, b) => b.similarity - a.similarity,
     );
-    const bestMatch = sortedVideos.length > 0 ? sortedVideos[0] : null;
+    const bestMatch = sortedVideos.length > 0 ? sortedVideos[0] : [];
 
     res.status(200).json(bestMatch);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Error fetching videos" });
   }
 };
@@ -67,7 +68,6 @@ export const uploadVideoAndAudio = async (
     const { frames, audio, latitude, longitude } = VideoAndAudio.parse(
       req.body,
     );
-
     // upload audio (base64 string) to server/audio folder on disk
     const audioDir = path.join(__dirname, "..", "audio");
     if (!fs.existsSync(audioDir)) {
@@ -123,6 +123,7 @@ export const uploadVideoAndAudio = async (
 
     res.status(200).json(videoRecord);
   } catch (error) {
+    console.error("Error in uploadVideoAndAudio:", error);
     res.status(500).json({ message: "Error uploading video" });
   }
 };

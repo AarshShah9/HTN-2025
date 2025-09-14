@@ -65,7 +65,14 @@ export async function transcribeAudioWithGemini(
     `;
     const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
-      contents: [prompt, file],
+      contents: [
+        {
+          parts: [
+            { text: prompt },
+            { fileData: { mimeType: "audio/wav", fileUri: file.uri } }
+          ]
+        }
+      ],
     });
     // Clean up uploaded file
     if (file.name) {
@@ -73,7 +80,7 @@ export async function transcribeAudioWithGemini(
     }
     return response.text?.trim() ?? null;
   } catch (err: any) {
-    console.error(`Error transcribing audio: ${err.message}`);
+    console.error("Error transcribing audio:", JSON.stringify(err, null, 2));
     return null;
   }
 }

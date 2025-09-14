@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router.get("/", getImages);
-router.post("/", uploadImageAndAudio);
+router.post("", uploadImageAndAudio);
 router.get("/by-description", getImagesByDescription);
 router.get("/by-transcription", getImagesByTranscription);
 
