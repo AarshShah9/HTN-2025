@@ -20,8 +20,16 @@ const areMemoriesSimilar = (
   const timeDiff = Math.abs(new Date(a.date).getTime() - new Date(b.date).getTime());
   if (timeDiff > timeThreshold) return false;
   
-  // Check if memories share at least one common tag
-  return a.tags.some(tag => b.tags.includes(tag));
+  // Check if either memory has no tags
+  if (a.tags.length === 0 || b.tags.length === 0) return false;
+  
+  // Calculate tag overlap percentage
+  const commonTags = a.tags.filter(tag => b.tags.includes(tag));
+  const minTags = Math.min(a.tags.length, b.tags.length);
+  const overlapPercentage = (commonTags.length / minTags) * 100;
+  
+  // Require at least 80% tag overlap
+  return overlapPercentage >= 80;
 };
 
 // Group similar memories together
