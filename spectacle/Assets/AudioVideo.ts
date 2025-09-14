@@ -242,14 +242,17 @@ export class AudioVideo extends BaseScriptComponent {
         if (this.isSending) return;
         this.isSending = true;
 
-        let audioBase64 = "";
+        let audioBase64: String = "";
         if (audioFrames.length > 0) {
             const combinedAudio = this.combineAudioFrames(audioFrames);
-            if (combinedAudio.length > 0) {
-                const pcmBytes = this.float32To16BitPCM(combinedAudio);
-                audioBase64 = this.uint8ArrayToBase64(pcmBytes);
-                print(`Audio encoded: ${audioBase64.length} characters from ${audioFrames.length} frames`);
-            }
+            // if (combinedAudio.length > 0) {
+            //     const buffer = combinedAudio.buffer;
+            //     var buff = buffer.slice();
+            //     Base64.encode(buff);
+            //     // audioBase64 = this.uint8ArrayToBase64(pcmBytes);
+            //     // print(`Audio encoded: ${audioBase64.length} characters from ${audioFrames.length} frames`);
+            // }
+            audioBase64 = new String(combinedAudio);
         }
 
         const body = JSON.stringify({
@@ -283,12 +286,13 @@ export class AudioVideo extends BaseScriptComponent {
 
         this.isSending = true;
         try {
-            let audioBase64 = "";
+            let audioBase64: String = "";
             if (this.audioFrameBuffer.length > 0) {
                 const combinedAudio = this.combineAudioFrames(this.audioFrameBuffer);
                 if (combinedAudio.length > 0) {
-                    audioBase64 = this.uint8ArrayToBase64(this.float32To16BitPCM(combinedAudio));
-                    print(`Replay audio encoded: ${audioBase64.length} characters from ${this.audioFrameBuffer.length} frames`);
+                    // audioBase64 = this.uint8ArrayToBase64(this.float32To16BitPCM(combinedAudio));
+                    // print(`Replay audio encoded: ${audioBase64.length} characters from ${this.audioFrameBuffer.length} frames`);
+                    audioBase64 = new String(combinedAudio);
                 }
             }
 
